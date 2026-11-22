@@ -149,28 +149,66 @@ export function projectGeoBboxTo2D(
   return { minX, minY, maxX, maxY };
 }
 
+const RING_OFFSETS: [number, number][] = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+  [0.707, 0.707],
+  [-0.707, 0.707],
+  [0.707, -0.707],
+  [-0.707, -0.707],
+];
+
+function containsMapPoint(
+  item: CompiledPlace2D,
+  mapX: number,
+  mapY: number,
+  lonLat: [number, number] | null
+): boolean {
+  const b = item.projectedBounds;
+  const pad = 2.5;
+  const crossesAntimeridian = item.place.bbox[2] - item.place.bbox[0] > 300;
+  if (
+    !crossesAntimeridian &&
+    (mapX < b.minX - pad || mapX > b.maxX + pad || mapY < b.minY - pad || mapY > b.maxY + pad)
+  ) {
+    return false;
+  }
+
+  // Pixel-exact C++ Skia hit-test matches rendered coastlines 1:1
+  if (typeof item.skPath?.contains === 'function') {
+    return item.skPath.contains(mapX, mapY);
+  }
+
+  if (lonLat && Number.isFinite(lonLat[0]) && Number.isFinite(lonLat[1])) {
+    return d3Geo.geoContains(item.feature, lonLat);
+  }
+  return false;
+}
+
 /**
- * Fast hit-test in 2D map space:
- * 1. Exact inverse-projection + bbox pre-filter + geoContains
- * 2. Adaptive microstate pin fallback so small countries (Monaco, Singapore, Malta, etc.) are easy to tap
+ * Fast, forgiving hit-test in 2D map space across ALL rendered places (countries + territories):
+ * 1. Direct tap on a microstate pin (e.g. Monaco, San Marino, Singapore, Vatican)
+ * 2. Pixel-exact polygon containment (smallest area wins so enclaves like Lesotho win)
+ * 3. Generous screen-space thumb-tolerance ring around coastlines & small islands (New Caledonia, Fiji, Cyprus, etc.)
  */
 export function hitTest2D(
   mapX: number,
   mapY: number,
-  currentScale: number,
-  includeTerritories: boolean
+  currentScale: number
 ): string | null {
   const engine = getGeoEngine2D();
-  const lonLat = engine.projection.invert?.([mapX, mapY]);
+  const safeScale = Math.max(0.35, currentScale);
 
-  // 1. Check microstate pins first when zoomed out so tiny countries inside larger ones (e.g. San Marino, Vatican, Monaco) are tappable!
-  const pinHitRadiusMap = 13 / Math.max(1, currentScale);
+  // 1. Check direct microstate pin hit so tiny states inside larger countries stay effortlessly tappable
+  const directMicroRadius = 15 / safeScale;
+  const fallbackMicroRadius = 24 / safeScale;
   let nearestMicroId: string | null = null;
-  let nearestMicroDist = pinHitRadiusMap;
+  let nearestMicroDist = fallbackMicroRadius;
 
   for (const item of engine.places) {
     if (!item.place.isMicrostate) continue;
-    if (!includeTerritories && !item.place.isUnMember) continue;
     const dx = item.projectedCentroid[0] - mapX;
     const dy = item.projectedCentroid[1] - mapY;
     const dist = Math.hypot(dx, dy);
@@ -180,110 +218,41 @@ export function hitTest2D(
     }
   }
 
-  // Prefer microstate pin if tapped right on top of it
-  if (nearestMicroId && nearestMicroDist < pinHitRadiusMap * 0.72) {
+  if (nearestMicroId && nearestMicroDist <= directMicroRadius) {
     return nearestMicroId;
   }
 
-  // 2. Exact polygon containment test
-  if (lonLat && Number.isFinite(lonLat[0]) && Number.isFinite(lonLat[1])) {
-    const [lon, lat] = lonLat;
-    // Check smaller areas first so enclaves (e.g., Lesotho inside South Africa) win!
-    let matched: CompiledPlace2D | null = null;
-    for (const item of engine.places) {
-      if (!includeTerritories && !item.place.isUnMember) continue;
-      const [minLon, minLat, maxLon, maxLat] = item.place.bbox;
-      // Handle antimeridian-crossing countries (Fiji, Russia, Kiribati) gracefully
-      const crossesAntimeridian = maxLon - minLon > 300;
-      if (
-        !crossesAntimeridian &&
-        (lon < minLon - 0.5 || lon > maxLon + 0.5 || lat < minLat - 0.5 || lat > maxLat + 0.5)
-      ) {
-        continue;
+  // 2. Exact polygon containment at the tap point (smallest area wins for enclaves)
+  const lonLat = engine.projection.invert?.([mapX, mapY]) ?? null;
+  let exactMatch: CompiledPlace2D | null = null;
+  for (const item of engine.places) {
+    if (containsMapPoint(item, mapX, mapY, lonLat)) {
+      if (!exactMatch || item.place.areaSr < exactMatch.place.areaSr) {
+        exactMatch = item;
       }
-      if (d3Geo.geoContains(item.feature, [lon, lat])) {
-        if (!matched || item.place.areaSr < matched.place.areaSr) {
-          matched = item;
+    }
+  }
+  if (exactMatch) return exactMatch.id;
+
+  // 3. Coastal & small-island thumb tolerance (8px then 18px screen radius)
+  for (const radiusPx of [8, 18]) {
+    const rMap = radiusPx / safeScale;
+    let ringMatch: CompiledPlace2D | null = null;
+    for (const [ox, oy] of RING_OFFSETS) {
+      const px = mapX + ox * rMap;
+      const py = mapY + oy * rMap;
+      const ringLonLat = engine.projection.invert?.([px, py]) ?? null;
+      for (const item of engine.places) {
+        if (containsMapPoint(item, px, py, ringLonLat)) {
+          if (!ringMatch || item.place.areaSr < ringMatch.place.areaSr) {
+            ringMatch = item;
+          }
         }
       }
     }
-    if (matched) return matched.id;
+    if (ringMatch) return ringMatch.id;
   }
 
-  // 3. Fallback to nearest microstate / tiny island within touch tolerance
+  // 4. Final fallback to nearest microstate within generous touch tolerance
   return nearestMicroId;
-}
-
-/**
- * 3D Orthographic Globe projection & hit-testing helpers
- */
-export function createGlobeProjection(
-  centerX: number,
-  centerY: number,
-  radius: number,
-  rotateLon: number,
-  rotateLat: number
-): d3Geo.GeoProjection {
-  return d3Geo
-    .geoOrthographic()
-    .translate([centerX, centerY])
-    .scale(radius)
-    .clipAngle(90)
-    .rotate([rotateLon, rotateLat, 0]);
-}
-
-export function hitTest3D(
-  screenX: number,
-  screenY: number,
-  projection: d3Geo.GeoProjection,
-  includeTerritories: boolean
-): string | null {
-  const lonLat = projection.invert?.([screenX, screenY]);
-  if (!lonLat || !Number.isFinite(lonLat[0]) || !Number.isFinite(lonLat[1])) {
-    return null;
-  }
-
-  const features = getWorldFeatures();
-  const [lon, lat] = lonLat;
-  let matched: { id: string; areaSr: number } | null = null;
-
-  for (const feat of features) {
-    const id = feat.properties?.id || String(feat.id ?? '');
-    const place = PLACE_BY_ID[id];
-    if (!place) continue;
-    if (!includeTerritories && !place.isUnMember) continue;
-
-    const [minLon, minLat, maxLon, maxLat] = place.bbox;
-    const crossesAntimeridian = maxLon - minLon > 300;
-    if (
-      !crossesAntimeridian &&
-      (lon < minLon - 0.5 || lon > maxLon + 0.5 || lat < minLat - 0.5 || lat > maxLat + 0.5)
-    ) {
-      continue;
-    }
-    if (d3Geo.geoContains(feat, [lon, lat])) {
-      if (!matched || place.areaSr < matched.areaSr) {
-        matched = { id, areaSr: place.areaSr };
-      }
-    }
-  }
-
-  if (matched) return matched.id;
-
-  // Microstate proximity fallback on the visible hemisphere
-  let bestId: string | null = null;
-  let bestDist = 18;
-  for (const place of PLACES_CATALOG) {
-    if (!place.isMicrostate) continue;
-    if (!includeTerritories && !place.isUnMember) continue;
-    const pt = projection(place.centroid);
-    if (!pt) continue;
-    const dist = Math.hypot(pt[0] - screenX, pt[1] - screenY);
-    if (dist < bestDist) {
-      bestDist = dist;
-      bestId = place.id;
-    }
-  }
-
-  return bestId;
 }

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Canvas, Circle, Path, Shader } from '@shopify/react-native-skia';
+import { Canvas, Circle, Path, Shader, useFont } from '@shopify/react-native-skia';
 import * as Haptics from 'expo-haptics';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { PLACE_BY_ID } from '@/data/places';
@@ -24,6 +24,7 @@ import {
   getHatchRuntimeEffect,
   getHomeRegionMiniMap,
 } from '@/map/cartography';
+import { exportTravelMapPng } from '@/map/exportMapPng';
 import {
   exportBackupToShareSheet,
   pickAndValidateBackupFile,
@@ -33,6 +34,10 @@ import { useTravelStore } from '@/store/useTravelStore';
 import { MAP_THEMES, THEME_ORDER } from '@/theme/mapThemes';
 import { FONTS } from '@/theme/typography';
 import { MapThemeId } from '@/types';
+
+const FONT_DISPLAY_TTF = require('@expo-google-fonts/encode-sans-semi-expanded/600SemiBold/EncodeSansSemiExpanded_600SemiBold.ttf');
+const FONT_NUM_TTF = require('@expo-google-fonts/encode-sans-condensed/600SemiBold/EncodeSansCondensed_600SemiBold.ttf');
+const FONT_BODY_TTF = require('@expo-google-fonts/encode-sans/400Regular/EncodeSans_400Regular.ttf');
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -51,8 +56,14 @@ export default function SettingsScreen() {
   const theme = MAP_THEMES[userProfile.mapTheme];
   const hatchEffect = useMemo(() => getHatchRuntimeEffect(), []);
 
+  const posterTitleFont = useFont(FONT_NUM_TTF, 88);
+  const posterHeadingFont = useFont(FONT_DISPLAY_TTF, 44);
+  const posterBodyFont = useFont(FONT_BODY_TTF, 28);
+  const posterSmallFont = useFont(FONT_BODY_TTF, 24);
+
   const [homePickerOpen, setHomePickerOpen] = useState(false);
   const [birthPickerOpen, setBirthPickerOpen] = useState(false);
+  const [exportingPng, setExportingPng] = useState(false);
   const [androidPendingBackup, setAndroidPendingBackup] = useState<BackupPreview | null>(
     null
   );
@@ -74,6 +85,30 @@ export default function SettingsScreen() {
   const homePlace = userProfile.homePlaceId
     ? PLACE_BY_ID[userProfile.homePlaceId]
     : null;
+
+  const handleExportPng = async () => {
+    if (exportingPng) return;
+    setExportingPng(true);
+    try {
+      await exportTravelMapPng({
+        userPlaces,
+        yearCollections,
+        collectionItems,
+        userProfile,
+        fonts: {
+          title: posterTitleFont,
+          heading: posterHeadingFont,
+          body: posterBodyFont,
+          small: posterSmallFont,
+        },
+      });
+      Haptics.selectionAsync();
+    } catch (e: any) {
+      Alert.alert('Could not export image', e?.message ?? 'Unable to render the map PNG.');
+    } finally {
+      setExportingPng(false);
+    }
+  };
 
   const handleSaveBackup = async () => {
     try {
@@ -235,6 +270,8 @@ export default function SettingsScreen() {
                                     ? t.landLived
                                     : st === 'visited'
                                     ? t.landVisited
+                                    : st === 'skipped'
+                                    ? t.landSkipped
                                     : t.landUnvisited
                                 }
                               />
@@ -332,7 +369,7 @@ export default function SettingsScreen() {
                 Include territories
               </Text>
               <Text style={[styles.rowDesc, { color: theme.textSecondary }]}>
-                Adds 47 places such as Greenland, Puerto Rico and Hong Kong.
+                Count 47 territories (New Caledonia, Greenland, Puerto Rico, etc.) in your totals. All territories can always be tapped on the map.
               </Text>
             </View>
             <Switch
@@ -493,14 +530,39 @@ export default function SettingsScreen() {
           </Text>
 
           <Pressable
+            onPress={handleExportPng}
+            disabled={exportingPng}
+            accessibilityRole="button"
+            accessibilityLabel="Export travel map as PNG"
+            style={({ pressed }) => [
+              styles.navRow,
+              { opacity: pressed || exportingPng ? 0.6 : 1 },
+            ]}
+          >
+            <Text style={[styles.rowTitle, { color: theme.accent }]}>
+              {exportingPng ? 'Preparing PNG…' : 'Export map as PNG'}
+            </Text>
+            <ChevronRight
+              size={16}
+              color={theme.textMuted}
+              strokeWidth={1.8}
+              absoluteStrokeWidth
+            />
+          </Pressable>
+
+          <Pressable
             onPress={handleSaveBackup}
             accessibilityRole="button"
             style={({ pressed }) => [
               styles.navRow,
-              { opacity: pressed ? 0.65 : 1 },
+              {
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: theme.cardBorder,
+                opacity: pressed ? 0.65 : 1,
+              },
             ]}
           >
-            <Text style={[styles.rowTitle, { color: theme.accent }]}>
+            <Text style={[styles.rowTitle, { color: theme.textPrimary }]}>
               Save a backup
             </Text>
             <ChevronRight

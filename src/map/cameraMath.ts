@@ -23,10 +23,22 @@ export interface MapBounds2D {
   maxY: number;
 }
 
-export const MIN_ZOOM_2D = 1.0;
+export const MIN_ZOOM_2D = 0.45;
 export const MAX_ZOOM_2D = 24.0;
 export const BASE_MAP_WIDTH = 1000;
 export const BASE_MAP_HEIGHT = 520;
+
+export function computeMinZoomForViewport(
+  viewport: ViewportSize,
+  mapWidth = 1000,
+  mapHeight = 520
+): number {
+  'worklet';
+  const fitX = Math.max(80, viewport.width - 20) / mapWidth;
+  const fitY = Math.max(80, viewport.height - 20) / mapHeight;
+  const raw = Math.min(fitX, fitY) * 0.96;
+  return Math.min(1.0, Math.max(0.35, raw));
+}
 
 export interface RegionPreset {
   id: string;
@@ -60,7 +72,7 @@ export function zoomAroundFocalPoint(
   nextScaleRaw: number,
   focalX: number,
   focalY: number,
-  minZoom = 1.0,
+  minZoom = 0.45,
   maxZoom = 24.0
 ): CameraState {
   'worklet';
@@ -169,13 +181,29 @@ export function computePortraitInitialCamera(
   mapWidth = BASE_MAP_WIDTH,
   mapHeight = BASE_MAP_HEIGHT
 ): CameraState {
+  const isPortrait = viewport.height > viewport.width;
+
+  // In landscape, frame the entire world map cleanly edge-to-edge
+  if (!isPortrait) {
+    const fitW = Math.max(120, viewport.width - 36) / mapWidth;
+    const fitH = Math.max(120, viewport.height - 32) / mapHeight;
+    const fullWorldScale = clamp(Math.min(fitW, fitH), 0.35, 4.5);
+    const tx = (viewport.width - mapWidth * fullWorldScale) / 2;
+    const ty = (viewport.height - mapHeight * fullWorldScale) / 2;
+    return clampCameraToBounds(
+      { scale: fullWorldScale, tx, ty },
+      viewport,
+      mapWidth,
+      mapHeight
+    );
+  }
+
   const fitWidthScale = viewport.width / mapWidth;
   const fitHeightScale = viewport.height / mapHeight;
   // In portrait, fill full vertical viewport height so there are zero top/bottom dead ocean bands
-  const isPortrait = viewport.height > viewport.width;
   const initialScale = clamp(
-    isPortrait ? Math.max(fitHeightScale * 1.18, fitWidthScale * 2.55) : fitWidthScale * 1.08,
-    MIN_ZOOM_2D,
+    Math.max(fitHeightScale * 1.18, fitWidthScale * 2.55),
+    1.0,
     4.5
   );
 

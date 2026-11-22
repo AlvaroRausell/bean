@@ -288,6 +288,14 @@ export default function PlansScreen() {
     [userPlaces]
   );
 
+  const skippedAll = useMemo(
+    () =>
+      PLACES_CATALOG.filter((p) => userPlaces[p.id]?.status === 'skipped').sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+    [userPlaces]
+  );
+
   // Continent-grouped wishlist (replaces flat 165-card wall!)
   const groupedWishlist = useMemo(() => {
     const q = wishQuery.trim().toLowerCase();
@@ -662,6 +670,73 @@ export default function PlansScreen() {
             ))
           )}
         </View>
+
+        {/* Not for me Section (quiet hairline list, shown only when user has marked places) */}
+        {skippedAll.length > 0 && (
+          <View style={[styles.wishSection, { borderTopColor: theme.cardBorder }]}>
+            <View style={styles.wishHeaderRow}>
+              <View style={styles.wishTitlePair}>
+                <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>
+                  Not for me
+                </Text>
+                <Text style={[styles.wishCount, { color: theme.textMuted }]}>
+                  {skippedAll.length}
+                </Text>
+              </View>
+            </View>
+            {skippedAll.map((item, idx) => (
+              <Pressable
+                key={item.id}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  selectPlace(item.id, true);
+                  router.navigate('/(tabs)');
+                }}
+                style={({ pressed }) => [
+                  styles.wishRow,
+                  idx > 0 && {
+                    borderTopWidth: StyleSheet.hairlineWidth,
+                    borderTopColor: theme.cardBorder,
+                  },
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <View style={styles.wishNameRow}>
+                  <Text
+                    style={[styles.wishName, { color: theme.textSecondary }]}
+                    numberOfLines={1}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+
+                <Pressable
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    setPlaceStatus(item.id, 'none', undefined, {
+                      silentInk: true,
+                      withUndo: true,
+                    });
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${item.name} from not for me`}
+                  hitSlop={10}
+                  style={({ pressed }) => [
+                    styles.removeWishBtn,
+                    { opacity: pressed ? 0.55 : 1 },
+                  ]}
+                >
+                  <X
+                    size={15}
+                    color={theme.textMuted}
+                    strokeWidth={1.8}
+                    absoluteStrokeWidth
+                  />
+                </Pressable>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </ScrollView>
 
       {/* Add Many Modal */}

@@ -4,7 +4,7 @@
     "slug": "bean",
     "version": "1.0.0",
     "scheme": "bean",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -14,12 +14,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bean.travel"
+      "bundleIdentifier": "com.bean.travel",
+      "icon": {
+        "light": "./assets/ios-icon-light.png",
+        "dark": "./assets/ios-icon-dark.png",
+        "tinted": "./assets/ios-icon-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FDFCF8"
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#5A1B35"
       },
       "package": "com.bean.travel"
     },

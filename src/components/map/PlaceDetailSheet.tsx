@@ -23,7 +23,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Check, Plus, Star, X } from 'lucide-react-native';
+import { Ban, Check, Plus, Star, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PLACE_BY_ID, UK_NATIONS } from '@/data/places';
 import {
@@ -40,7 +40,8 @@ const UK_INSET_W = 112;
 const UK_INSET_H = 120;
 
 export function PlaceDetailSheet() {
-  const { height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const isLandscape = screenWidth > screenHeight;
   const insets = useSafeAreaInsets();
 
   const selectedPlaceId = useTravelStore((s) => s.selectedPlaceId);
@@ -118,6 +119,7 @@ export function PlaceDetailSheet() {
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
+        .activeOffsetY([-10, 10])
         .onBegin(() => {
           dragStartY.value = translateY.value;
         })
@@ -196,6 +198,7 @@ export function PlaceDetailSheet() {
   const isBeen = currentStatus === 'visited' || currentStatus === 'lived';
   const isLived = currentStatus === 'lived';
   const isWant = currentStatus === 'wishlist';
+  const isSkipped = currentStatus === 'skipped';
   const isFavorite = Boolean(userPlace?.isFavorite);
 
   const handleToggleFavorite = async () => {
@@ -224,6 +227,15 @@ export function PlaceDetailSheet() {
     }
   };
 
+  const handleToggleSkipped = async () => {
+    Haptics.selectionAsync();
+    if (isSkipped) {
+      await setPlaceStatus(place.id, 'none');
+    } else {
+      await setPlaceStatus(place.id, 'skipped');
+    }
+  };
+
   const handleToggleLived = async (val: boolean) => {
     Haptics.selectionAsync();
     await setPlaceStatus(place.id, val ? 'lived' : 'visited');
@@ -233,8 +245,10 @@ export function PlaceDetailSheet() {
     setSheetHeight(e.nativeEvent.layout.height);
   };
 
-  const maxSheetHeight = expanded
-    ? Math.min(screenHeight * 0.80, 640)
+  const maxSheetHeight = isLandscape
+    ? Math.min(screenHeight * 0.8, 340)
+    : expanded
+    ? Math.min(screenHeight * 0.8, 640)
     : Math.min(screenHeight * 0.62, 535);
 
   const subtitle = isUkNation
@@ -247,6 +261,8 @@ export function PlaceDetailSheet() {
     ? theme.landLived
     : isBeen
     ? theme.landVisited
+    : isSkipped
+    ? theme.landSkipped
     : theme.landUnvisited;
 
   return (
@@ -267,14 +283,16 @@ export function PlaceDetailSheet() {
           },
         ]}
       >
-        {/* Drag Handle + Header */}
+        {/* Drag Handle + Header (buttons kept OUTSIDE GestureDetector so taps never get stolen) */}
         <GestureDetector gesture={panGesture}>
-          <View>
-            <View style={styles.grabberHit}>
-              <View style={[styles.grabber, { backgroundColor: theme.textMuted }]} />
-            </View>
+          <View style={styles.grabberHit}>
+            <View style={[styles.grabber, { backgroundColor: theme.textMuted }]} />
+          </View>
+        </GestureDetector>
 
-            <View style={styles.headerRow}>
+        <View style={styles.headerRow}>
+          <GestureDetector gesture={panGesture}>
+            <View style={styles.headerDraggable}>
               <View
                 style={[
                   styles.silhouetteBox,
@@ -311,73 +329,77 @@ export function PlaceDetailSheet() {
                   {subtitle}
                 </Text>
               </View>
-
-              <View style={styles.headerActions}>
-                <Pressable
-                  onPress={handleToggleFavorite}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isFavorite }}
-                  accessibilityLabel={
-                    isFavorite
-                      ? `Remove ${place.name} from favourites`
-                      : `Star ${place.name} as favourite`
-                  }
-                  style={({ pressed }) => [
-                    styles.headerIconBtn,
-                    {
-                      backgroundColor: isFavorite
-                        ? theme.favoriteSoft
-                        : theme.surfaceSubtle,
-                      borderColor: isFavorite
-                        ? theme.favoriteAccent
-                        : theme.cardBorder,
-                      opacity: pressed ? 0.7 : 1,
-                    },
-                  ]}
-                >
-                  <Star
-                    size={17}
-                    color={isFavorite ? theme.favoriteAccent : theme.textSecondary}
-                    fill={isFavorite ? theme.favoriteAccent : 'none'}
-                    strokeWidth={1.9}
-                    absoluteStrokeWidth
-                  />
-                </Pressable>
-
-                <Pressable
-                  onPress={() => selectPlace(null, false)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Close ${place.name}`}
-                  style={({ pressed }) => [
-                    styles.headerIconBtn,
-                    {
-                      backgroundColor: theme.surfaceSubtle,
-                      borderColor: theme.cardBorder,
-                      opacity: pressed ? 0.7 : 1,
-                    },
-                  ]}
-                >
-                  <X
-                    size={17}
-                    color={theme.textSecondary}
-                    strokeWidth={1.9}
-                    absoluteStrokeWidth
-                  />
-                </Pressable>
-              </View>
             </View>
+          </GestureDetector>
+
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={handleToggleFavorite}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isFavorite }}
+              accessibilityLabel={
+                isFavorite
+                  ? `Remove ${place.name} from favourites`
+                  : `Star ${place.name} as favourite`
+              }
+              style={({ pressed }) => [
+                styles.headerIconBtn,
+                {
+                  backgroundColor: isFavorite
+                    ? theme.favoriteSoft
+                    : theme.surfaceSubtle,
+                  borderColor: isFavorite
+                    ? theme.favoriteAccent
+                    : theme.cardBorder,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <Star
+                size={17}
+                color={isFavorite ? theme.favoriteAccent : theme.textSecondary}
+                fill={isFavorite ? theme.favoriteAccent : 'none'}
+                strokeWidth={1.9}
+                absoluteStrokeWidth
+              />
+            </Pressable>
+
+            <Pressable
+              onPress={() => selectPlace(null, false)}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel={`Close ${place.name}`}
+              style={({ pressed }) => [
+                styles.headerIconBtn,
+                {
+                  backgroundColor: theme.surfaceSubtle,
+                  borderColor: theme.cardBorder,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <X
+                size={17}
+                color={theme.textSecondary}
+                strokeWidth={1.9}
+                absoluteStrokeWidth
+              />
+            </Pressable>
           </View>
-        </GestureDetector>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           bounces={false}
           contentContainerStyle={{
-            paddingBottom: Math.max(insets.bottom, 14) + (Platform.OS === 'ios' ? 76 : 24),
+            paddingBottom:
+              Math.max(insets.bottom, 14) +
+              (isLandscape ? 52 : Platform.OS === 'ios' ? 76 : 24),
           }}
         >
-          {/* Two Honest Status Toggles (Been here / Want to go) */}
+          {/* Three Honest Status Toggles (Been here / Want to go / Not for me) */}
           <View style={styles.statusPair}>
             <Pressable
               onPress={handleToggleBeen}
@@ -394,13 +416,14 @@ export function PlaceDetailSheet() {
             >
               {isBeen && (
                 <Check
-                  size={15}
+                  size={14}
                   color={theme.accentInk}
                   strokeWidth={2.2}
                   absoluteStrokeWidth
                 />
               )}
               <Text
+                numberOfLines={1}
                 style={[
                   styles.statusBtnText,
                   { color: isBeen ? theme.accentInk : theme.textPrimary },
@@ -439,12 +462,46 @@ export function PlaceDetailSheet() {
                 />
               </View>
               <Text
+                numberOfLines={1}
                 style={[
                   styles.statusBtnText,
                   { color: isWant ? theme.accent : theme.textPrimary },
                 ]}
               >
                 Want to go
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleToggleSkipped}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isSkipped }}
+              accessibilityLabel={`Mark ${place.name} as not for me`}
+              style={({ pressed }) => [
+                styles.statusBtn,
+                {
+                  backgroundColor: isSkipped
+                    ? theme.skippedSoft
+                    : theme.surfaceElevated,
+                  borderColor: isSkipped ? theme.skippedAccent : theme.cardBorder,
+                  opacity: pressed ? 0.78 : 1,
+                },
+              ]}
+            >
+              <Ban
+                size={13}
+                color={isSkipped ? theme.skippedAccent : theme.textSecondary}
+                strokeWidth={1.9}
+                absoluteStrokeWidth
+              />
+              <Text
+                numberOfLines={1}
+                style={[
+                  styles.statusBtnText,
+                  { color: isSkipped ? theme.skippedAccent : theme.textPrimary },
+                ]}
+              >
+                Not for me
               </Text>
             </Pressable>
           </View>
@@ -614,6 +671,8 @@ export function PlaceDetailSheet() {
                         ? theme.landLived
                         : st === 'visited'
                         ? theme.landVisited
+                        : st === 'skipped'
+                        ? theme.landSkipped
                         : theme.landUnvisited;
                     return (
                       <React.Fragment key={p.id}>
@@ -670,6 +729,8 @@ export function PlaceDetailSheet() {
                       ? theme.landLived
                       : st === 'visited'
                       ? theme.landVisited
+                      : st === 'skipped'
+                      ? theme.landSkipped
                       : 'transparent';
                   return (
                     <Pressable
@@ -764,8 +825,14 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
     marginBottom: 14,
+  },
+  headerDraggable: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   silhouetteBox: {
     width: 44,
@@ -807,7 +874,7 @@ const styles = StyleSheet.create({
   },
   statusPair: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
     marginBottom: 12,
   },
   statusBtn: {
@@ -818,13 +885,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 7,
-    paddingLeft: 12,
-    paddingRight: 14,
+    gap: 5,
+    paddingHorizontal: 8,
   },
   statusBtnText: {
     fontFamily: FONTS.bodySemiBold,
-    fontSize: 14,
+    fontSize: 13,
   },
   hatchGlyph: {
     width: 13,
@@ -861,8 +927,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    height: 32,
-    paddingHorizontal: 10,
+    height: 36,
+    paddingHorizontal: 11,
     borderRadius: 9,
     borderWidth: StyleSheet.hairlineWidth,
   },
@@ -913,7 +979,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: 32,
+    height: 36,
     paddingHorizontal: 10,
     borderRadius: 8,
   },

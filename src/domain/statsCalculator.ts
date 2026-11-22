@@ -60,6 +60,8 @@ export interface WorldStats {
   visitedCount: number;
   livedCount: number;
   wishlistCount: number;
+  skippedCount: number;
+  skippedPlaces: Place[];
   favoritesCount: number;
   favoritePlaces: Place[];
   totalCount: number;
@@ -220,6 +222,7 @@ export function computeWorldStats(
   const visitedSet = new Set<string>();
   const livedSet = new Set<string>();
   const wishlistSet = new Set<string>();
+  const skippedSet = new Set<string>();
   const favoriteSet = new Set<string>();
 
   for (const up of Object.values(userPlaces)) {
@@ -230,11 +233,16 @@ export function computeWorldStats(
       livedSet.add(up.placeId);
     }
     if (up.status === 'wishlist') wishlistSet.add(up.placeId);
+    if (up.status === 'skipped') skippedSet.add(up.placeId);
     if (up.isFavorite) favoriteSet.add(up.placeId);
   }
 
   const favoritePlaces = catalog
     .filter((p) => favoriteSet.has(p.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const skippedPlaces = catalog
+    .filter((p) => skippedSet.has(p.id))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const worldCounts = countPlacesWithMode(eligible, visitedSet, options.countingMode);
@@ -316,6 +324,8 @@ export function computeWorldStats(
     visitedCount: worldCounts.visited,
     livedCount: livedCounts.visited,
     wishlistCount: wishlistCounts.visited,
+    skippedCount: skippedPlaces.length,
+    skippedPlaces,
     favoritesCount: favoritePlaces.length,
     favoritePlaces,
     totalCount: worldCounts.total,

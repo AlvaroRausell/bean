@@ -5,7 +5,6 @@ import {
   CollectionItem,
   CollectionType,
   MapOverlayMode,
-  MapProjectionMode,
   PlaceStatus,
   TravelGoal,
   UserPlace,
@@ -42,7 +41,7 @@ export interface CameraRequest {
 export interface InkEvent {
   id: number;
   placeId: string;
-  status: 'visited' | 'wishlist' | 'lived';
+  status: 'visited' | 'wishlist' | 'lived' | 'skipped';
   mapX?: number;
   mapY?: number;
 }
@@ -74,7 +73,6 @@ interface TravelStore {
   userProfile: UserProfile;
 
   // Map & UI state
-  projectionMode: MapProjectionMode;
   overlayMode: MapOverlayMode;
   activeYearCollectionId: string | null;
   selectedPlaceId: string | null;
@@ -90,7 +88,6 @@ interface TravelStore {
 
   // Actions
   hydrate: () => Promise<void>;
-  setProjectionMode: (mode: MapProjectionMode) => void;
   setOverlayMode: (mode: MapOverlayMode, yearCollectionId?: string | null) => void;
   setPlanSubTab: (tab: 'goals' | 'wishlist' | 'years') => void;
   setSelectExceptModalOpen: (open: boolean) => void;
@@ -155,7 +152,6 @@ export const useTravelStore = create<TravelStore>((set, get) => ({
   travelGoals: [],
   userProfile: createDefaultProfile(),
 
-  projectionMode: '2d',
   overlayMode: 'all',
   activeYearCollectionId: null,
   selectedPlaceId: null,
@@ -187,11 +183,8 @@ export const useTravelStore = create<TravelStore>((set, get) => ({
       travelGoals:
         current.travelGoals.length > 0 ? current.travelGoals : loaded.travelGoals,
       userProfile: loaded.userProfile,
-      projectionMode: loaded.userProfile.defaultProjection,
     }));
   },
-
-  setProjectionMode: (mode) => set({ projectionMode: mode }),
 
   setPlanSubTab: (tab) => set({ planSubTab: tab }),
   setSelectExceptModalOpen: (open) => set({ selectExceptModalOpen: open }),
@@ -275,7 +268,10 @@ export const useTravelStore = create<TravelStore>((set, get) => ({
     const tapPt = get().lastTapMapPoint;
     const shouldInk =
       !options?.silentInk &&
-      (status === 'visited' || status === 'wishlist' || status === 'lived') &&
+      (status === 'visited' ||
+        status === 'wishlist' ||
+        status === 'lived' ||
+        status === 'skipped') &&
       prevStatus !== status;
 
     const placeName = PLACE_BY_ID[placeId]?.name ?? 'Place';
@@ -309,6 +305,8 @@ export const useTravelStore = create<TravelStore>((set, get) => ({
                 ? `Removed ${placeName}`
                 : status === 'visited'
                 ? `Marked ${placeName} as been`
+                : status === 'skipped'
+                ? `Marked ${placeName} as not for me`
                 : `Updated ${placeName}`,
             previousPlaces: [previousSnapshot],
           }
@@ -684,10 +682,6 @@ export const useTravelStore = create<TravelStore>((set, get) => ({
     };
     set({
       userProfile: updated,
-      projectionMode:
-        partial.defaultProjection !== undefined
-          ? partial.defaultProjection
-          : get().projectionMode,
     });
     const db = await getDatabase();
     await upsertUserProfile(db, updated);

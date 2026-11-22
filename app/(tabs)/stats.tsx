@@ -17,18 +17,11 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   Canvas,
   Circle,
-  drawAsImage,
-  Group,
   Path,
-  Rect,
-  RoundedRect,
   Shader,
   Skia,
-  Text as SkiaText,
   useFont,
 } from '@shopify/react-native-skia';
-import { File, Paths } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import * as Haptics from 'expo-haptics';
 import {
   Check,
@@ -53,6 +46,7 @@ import {
   getHatchRuntimeEffect,
   getWorldMiniMap,
 } from '@/map/cartography';
+import { exportTravelMapPng } from '@/map/exportMapPng';
 import { useTravelStore } from '@/store/useTravelStore';
 import { MAP_THEMES } from '@/theme/mapThemes';
 import { FONTS } from '@/theme/typography';
@@ -258,10 +252,7 @@ export default function RecordScreen() {
     );
   }, []);
 
-  const pickerPlaces = useMemo(
-    () => searchPlaces(pickerQuery, userProfile.includeTerritories),
-    [pickerQuery, userProfile.includeTerritories]
-  );
+  const pickerPlaces = useMemo(() => searchPlaces(pickerQuery, true), [pickerQuery]);
 
   const selectableYears = useMemo(() => {
     const out: number[] = [];
@@ -315,200 +306,23 @@ export default function RecordScreen() {
     setEditingCollectionId(created.id);
   };
 
-  // Dedicated 1080×1350 offscreen Skia Share Poster
+  // Dedicated 1080×1350 offscreen Skia Share Poster (shared with Settings -> Export map as PNG)
   const handleSharePoster = async () => {
     if (sharing) return;
     setSharing(true);
     try {
-      const W = 1080;
-      const H = 1350;
-      const posterMap = getWorldMiniMap(960, 500, 8);
-      const posterHatch = buildHatchUniforms(
-        theme.landUnvisited,
-        theme.landWishlist,
-        12,
-        2.6
-      );
-
-      const posterEl = (
-        <Group>
-          {/* Paper background */}
-          <Rect x={0} y={0} width={W} height={H} color={theme.surface} />
-          {/* Subtle cartographic neatline border */}
-          <RoundedRect
-            x={36}
-            y={36}
-            width={W - 72}
-            height={H - 72}
-            r={28}
-            color={theme.cardBorder}
-            style="stroke"
-            strokeWidth={2}
-          />
-
-          {/* Count headline */}
-          {posterTitleFont && (
-            <SkiaText
-              x={84}
-              y={176}
-              text={`${stats.visitedCount} of ${stats.totalCount}`}
-              font={posterTitleFont}
-              color={theme.textPrimary}
-            />
-          )}
-          {posterHeadingFont && (
-            <SkiaText
-              x={84}
-              y={236}
-              text="countries"
-              font={posterHeadingFont}
-              color={theme.textSecondary}
-            />
-          )}
-          {posterBodyFont && (
-            <SkiaText
-              x={84}
-              y={284}
-              text={
-                userProfile.countingMode === 'uk_split_un'
-                  ? 'Counting UK nations separately'
-                  : 'United Nations standard'
-              }
-              font={posterBodyFont}
-              color={theme.textMuted}
-            />
-          )}
-
-          {/* Centered uncropped world map */}
-          <Group transform={[{ translateX: 60 }, { translateY: 380 }]}>
-            {posterMap.spherePath && (
-              <>
-                <Path path={posterMap.spherePath} color={theme.ocean} />
-                <Path
-                  path={posterMap.spherePath}
-                  color={theme.cardBorder}
-                  style="stroke"
-                  strokeWidth={2}
-                />
-              </>
-            )}
-            {posterMap.places.map((item) => {
-              const st = userPlaces[item.id]?.status ?? 'none';
-              return (
-                <React.Fragment key={item.id}>
-                  {st === 'wishlist' && hatchEffect ? (
-                    <Path path={item.skPath}>
-                      <Shader source={hatchEffect} uniforms={posterHatch} />
-                    </Path>
-                  ) : (
-                    <Path
-                      path={item.skPath}
-                      color={
-                        st === 'lived'
-                          ? theme.landLived
-                          : st === 'visited'
-                          ? theme.landVisited
-                          : theme.landUnvisited
-                      }
-                    />
-                  )}
-                  <Path
-                    path={item.skPath}
-                    color={theme.border}
-                    style="stroke"
-                    strokeWidth={1.1}
-                    strokeJoin="round"
-                  />
-                  {st === 'lived' && (
-                    <Circle
-                      cx={item.centroid[0]}
-                      cy={item.centroid[1]}
-                      r={4.5}
-                      color={theme.livedDot}
-                    />
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </Group>
-
-          {/* Hairline footer rule */}
-          <Rect x={84} y={1020} width={W - 168} height={2} color={theme.cardBorder} />
-
-          {/* Legend */}
-          <RoundedRect
-            x={84}
-            y={1074}
-            width={26}
-            height={26}
-            r={6}
-            color={theme.landVisited}
-          />
-          {posterBodyFont && (
-            <SkiaText
-              x={124}
-              y={1097}
-              text={`Been ${stats.visitedCount}`}
-              font={posterBodyFont}
-              color={theme.textPrimary}
-            />
-          )}
-
-          <RoundedRect
-            x={310}
-            y={1074}
-            width={26}
-            height={26}
-            r={6}
-            color={theme.landUnvisited}
-          />
-          <RoundedRect
-            x={310}
-            y={1074}
-            width={26}
-            height={26}
-            r={6}
-            color={theme.landWishlist}
-            style="stroke"
-            strokeWidth={3}
-          />
-          {posterBodyFont && (
-            <SkiaText
-              x={350}
-              y={1097}
-              text={`Want ${stats.wishlistCount}`}
-              font={posterBodyFont}
-              color={theme.textPrimary}
-            />
-          )}
-
-          {/* Wordmark */}
-          {posterSmallFont && (
-            <SkiaText
-              x={84}
-              y={1232}
-              text={`Bean  ${theme.name}`}
-              font={posterSmallFont}
-              color={theme.textMuted}
-            />
-          )}
-        </Group>
-      );
-
-      const snapshot = await drawAsImage(posterEl, { width: W, height: H });
-      if (!snapshot) {
-        Alert.alert('Could not create image', 'Try again in a moment.');
-        return;
-      }
-      const b64 = snapshot.encodeToBase64();
-      const file = new File(Paths.cache, `bean-record-${Date.now()}.png`);
-      file.write(b64, { encoding: 'base64' });
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(file.uri, {
-          mimeType: 'image/png',
-          dialogTitle: `${stats.visitedCount} of ${stats.totalCount} countries`,
-        });
-      }
+      await exportTravelMapPng({
+        userPlaces,
+        yearCollections,
+        collectionItems,
+        userProfile,
+        fonts: {
+          title: posterTitleFont,
+          heading: posterHeadingFont,
+          body: posterBodyFont,
+          small: posterSmallFont,
+        },
+      });
     } catch (e: any) {
       Alert.alert('Could not share', e?.message ?? 'Unable to save the map image.');
     } finally {
@@ -615,6 +429,8 @@ export default function RecordScreen() {
                             ? theme.landLived
                             : st === 'visited'
                             ? theme.landVisited
+                            : st === 'skipped'
+                            ? theme.landSkipped
                             : theme.landUnvisited
                         }
                       />
@@ -690,6 +506,8 @@ export default function RecordScreen() {
                                   ? theme.landLived
                                   : st === 'visited'
                                   ? theme.landVisited
+                                  : st === 'skipped'
+                                  ? theme.landSkipped
                                   : theme.landUnvisited
                               }
                             />

@@ -144,4 +144,37 @@ describe('Wishlist "Select All Except" & Offline JSON Backup/Restore', () => {
     const parsedScot = parsed.backup.data.userPlaces.find((p) => p.placeId === 'GB-SCT');
     expect(parsedScot?.isFavorite).toBe(true);
   });
+
+  it('respects "Not for me" (skipped) places in bulk wishlist updates and preserves them across backup round-trips', () => {
+    const t0 = '2026-06-01T10:00:00.000Z';
+    const current: Record<string, UserPlace> = {
+      KP: {
+        placeId: 'KP',
+        status: 'skipped',
+        firstVisitedYear: null,
+        notes: null,
+        isFavorite: false,
+        updatedAt: t0,
+        deletedAt: null,
+      },
+    };
+
+    const bulk = computeBulkWishlistExcept(PLACES_CATALOG, current, new Set(), {
+      continent: 'Asia',
+      includeTerritories: false,
+      excludeAlreadyVisited: true,
+    });
+    expect(bulk.updates.some((u) => u.placeId === 'KP')).toBe(false);
+
+    const payload = buildBackupPayload({
+      userPlaces: current,
+      yearCollections: [],
+      collectionItems: [],
+      travelGoals: [],
+      userProfile: createDefaultProfile(t0),
+    });
+    const parsed = parseAndValidateBackup(JSON.stringify(payload));
+    const parsedKp = parsed.backup.data.userPlaces.find((p) => p.placeId === 'KP');
+    expect(parsedKp?.status).toBe('skipped');
+  });
 });

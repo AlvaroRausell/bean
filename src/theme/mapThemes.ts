@@ -16,6 +16,7 @@ export interface MapTheme {
   landVisited: string;
   landLived: string;
   landWishlist: string; // diagonal hatch ink colour
+  landSkipped: string; // quiet desaturated stone for "Not for me"
   landYearHighlight: string;
   livedDot: string;
   border: string;
@@ -42,6 +43,8 @@ export interface MapTheme {
   livedAccent: string;
   favoriteAccent: string;
   favoriteSoft: string;
+  skippedAccent: string;
+  skippedSoft: string;
   danger: string;
   cardBorder: string; // pure neutral hairline
   switchTrackOff: string;
@@ -63,6 +66,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     landVisited: '#E9F0F7',
     landLived: '#EFA43A',
     landWishlist: '#E9F0F7',
+    landSkipped: '#122943',
     landYearHighlight: '#9CCBFF',
     livedDot: '#0C2440',
     border: '#7FA2C6',
@@ -88,6 +92,8 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     livedAccent: '#EFA43A',
     favoriteAccent: '#F2C14E',
     favoriteSoft: 'rgba(242, 193, 78, 0.16)',
+    skippedAccent: '#8FAAC6',
+    skippedSoft: 'rgba(143, 170, 198, 0.16)',
     danger: '#FF9B87',
     cardBorder: 'rgba(238, 244, 250, 0.13)',
     switchTrackOff: 'rgba(238, 244, 250, 0.22)',
@@ -107,6 +113,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     landVisited: '#BF4468',
     landLived: '#4A1B33',
     landWishlist: '#BF4468',
+    landSkipped: '#D6D4CC',
     landYearHighlight: '#A32E57',
     livedDot: '#FDFCF8',
     border: '#857548',
@@ -132,6 +139,8 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     livedAccent: '#4A1B33',
     favoriteAccent: '#C98A1A',
     favoriteSoft: 'rgba(201, 138, 26, 0.12)',
+    skippedAccent: '#5C6470',
+    skippedSoft: 'rgba(92, 100, 112, 0.12)',
     danger: '#B3261E',
     cardBorder: 'rgba(26, 34, 51, 0.11)',
     switchTrackOff: 'rgba(26, 34, 51, 0.18)',
@@ -151,6 +160,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     landVisited: '#3B7A53',
     landLived: '#173A5E',
     landWishlist: '#A85A18',
+    landSkipped: '#D7DBD4',
     landYearHighlight: '#2A6642',
     livedDot: '#F6F7F4',
     border: '#647066',
@@ -176,6 +186,8 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     livedAccent: '#173A5E',
     favoriteAccent: '#C27D16',
     favoriteSoft: 'rgba(194, 125, 22, 0.12)',
+    skippedAccent: '#5B675E',
+    skippedSoft: 'rgba(91, 103, 94, 0.12)',
     danger: '#B3261E',
     cardBorder: 'rgba(24, 33, 28, 0.11)',
     switchTrackOff: 'rgba(24, 33, 28, 0.18)',

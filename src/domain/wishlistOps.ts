@@ -43,6 +43,9 @@ export function computeBulkWishlistExcept(
     if (scope.excludeAlreadyVisited && isVisitedStatus(existing?.status)) {
       continue;
     }
+    if (existing?.status === 'skipped' && !existing.deletedAt) {
+      continue;
+    }
     if (existing?.status === 'wishlist' && !existing.deletedAt) {
       continue;
     }

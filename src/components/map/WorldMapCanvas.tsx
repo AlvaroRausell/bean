@@ -10,13 +10,11 @@ import {
   View,
 } from 'react-native';
 import {
-  BlurMask,
   Canvas,
   Circle,
   Group,
   LinearGradient,
   Path,
-  RadialGradient,
   Rect,
   Shader,
   Skia,
@@ -37,35 +35,27 @@ import Animated, {
   withDecay,
   withTiming,
 } from 'react-native-reanimated';
-import * as d3Geo from 'd3-geo';
 import * as Haptics from 'expo-haptics';
-import { Globe2, Map as MapIcon, RotateCcw, Search, Star, X } from 'lucide-react-native';
+import { RotateCcw, Search, Star, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  BASE_MAP_HEIGHT,
-  BASE_MAP_WIDTH,
   CameraState,
   clamp,
   clampCameraToBounds,
   computeAdaptiveStrokeWidth,
+  computeMinZoomForViewport,
   computePortraitInitialCamera,
   fitProjectedBoundsToViewport,
-  MIN_ZOOM_2D,
-  REGION_PRESETS,
   screenToMapPoint,
   zoomAroundFocalPoint,
 } from '@/map/cameraMath';
 import {
-  buildHatchUniforms,
   getHatchRuntimeEffect,
   hexToColorVec4,
 } from '@/map/cartography';
 import {
-  createGlobeProjection,
   getGeoEngine2D,
-  getWorldFeatures,
   hitTest2D,
-  hitTest3D,
   projectGeoBboxTo2D,
 } from '@/map/geoEngine';
 import { PLACE_BY_ID, PLACES_CATALOG } from '@/data/places';
@@ -102,7 +92,7 @@ const LiveStarMarker2D = React.memo(function LiveStarMarker2D({
 }) {
   const transform = useDerivedValue(() => [
     { translateX: mapX * scale.value + tx.value },
-    { translateY: mapY * scale.value + ty.value - (scale.value >= 1.35 ? 13 : 0) },
+    { translateY: mapY * scale.value + ty.value - (scale.value >= 1.3 ? 13 : 0) },
   ]);
   return (
     <Group transform={transform}>
@@ -172,13 +162,12 @@ const LiveSkiaLabel = React.memo(function LiveSkiaLabel({
 export function WorldMapCanvas({ onOpenSearch }: Props) {
   const { width, height } = useWindowDimensions();
   const safeInsets = useSafeAreaInsets();
+  const isLandscape = width > height;
 
   const userPlaces = useTravelStore((s) => s.userPlaces);
   const yearCollections = useTravelStore((s) => s.yearCollections);
   const collectionItems = useTravelStore((s) => s.collectionItems);
   const userProfile = useTravelStore((s) => s.userProfile);
-  const projectionMode = useTravelStore((s) => s.projectionMode);
-  const setProjectionMode = useTravelStore((s) => s.setProjectionMode);
   const overlayMode = useTravelStore((s) => s.overlayMode);
   const setOverlayMode = useTravelStore((s) => s.setOverlayMode);
   const activeYearCollectionId = useTravelStore((s) => s.activeYearCollectionId);
@@ -238,9 +227,18 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     );
   }, [collectionItems, activeYearCollectionId]);
 
+  const minZoom = useMemo(
+    () => computeMinZoomForViewport({ width, height }),
+    [width, height]
+  );
+
   // ---------- 2D Camera State (UI thread Reanimated SharedValues) ----------
   const initialCam = useMemo(() => {
     const base = computePortraitInitialCamera({ width, height });
+    // In landscape, always frame the full world cleanly edge-to-edge
+    if (width > height) {
+      return base;
+    }
     if (userProfile.homePlaceId) {
       const compiledHome = engine2D.placeById[userProfile.homePlaceId];
       if (compiledHome) {
@@ -263,41 +261,44 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   const tx = useSharedValue(initialCam.tx);
   const ty = useSharedValue(initialCam.ty);
 
-  // Gesture scratch shared values
-  const panStartTx = useSharedValue(0);
-  const panStartTy = useSharedValue(0);
+  // Gesture scratch shared values (conflict-free pan & pinch)
+  const isPinching = useSharedValue(false);
+  const panLastTransX = useSharedValue(0);
+  const panLastTransY = useSharedValue(0);
   const pinchStartScale = useSharedValue(1);
   const pinchStartTx = useSharedValue(0);
   const pinchStartTy = useSharedValue(0);
   const pinchStartFocalX = useSharedValue(0);
   const pinchStartFocalY = useSharedValue(0);
 
-  // One-handed double-tap + drag zoom state
-  const lastTapTs = useSharedValue(0);
-  const lastTapX = useSharedValue(0);
-  const lastTapY = useSharedValue(0);
-  const oneFingerZoomActive = useSharedValue(false);
-  const oneFingerStartScale = useSharedValue(1);
-  const oneFingerStartTx = useSharedValue(0);
-  const oneFingerStartTy = useSharedValue(0);
-
   const [settledCam, setSettledCam] = useState<CameraState>(initialCam);
   const hasUserMoved2DRef = useRef(false);
+  const prevIsLandscapeRef = useRef(isLandscape);
 
-  // Keep initial camera & Recenter state synced when SQLite profile (homePlaceId) hydrates before user moves map
+  // Re-fit camera automatically on orientation switch (portrait <-> landscape full-world)
+  // and on initial SQLite homePlaceId hydration before the user moves the map
   useEffect(() => {
-    if (hasUserMoved2DRef.current) return;
+    const orientationChanged = prevIsLandscapeRef.current !== isLandscape;
+    prevIsLandscapeRef.current = isLandscape;
+    if (!orientationChanged && hasUserMoved2DRef.current) return;
+
+    cancelAnimation(scale);
+    cancelAnimation(tx);
+    cancelAnimation(ty);
+    if (orientationChanged) {
+      hasUserMoved2DRef.current = false;
+    }
     scale.value = initialCam.scale;
     tx.value = initialCam.tx;
     ty.value = initialCam.ty;
     setSettledCam(initialCam);
-  }, [initialCam, scale, tx, ty]);
+  }, [initialCam, isLandscape, scale, tx, ty]);
 
   // ---------- Signature Skia Ink-Flood Animation ----------
   const [activeInk, setActiveInk] = useState<{
     id: number;
     placeId: string;
-    status: 'visited' | 'wishlist' | 'lived';
+    status: 'visited' | 'wishlist' | 'lived' | 'skipped';
     cx: number;
     cy: number;
     maxR: number;
@@ -305,7 +306,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   const inkProgress = useSharedValue(1);
 
   useEffect(() => {
-    if (!lastInkEvent || projectionMode !== '2d' || reduceMotion) {
+    if (!lastInkEvent || reduceMotion) {
       setActiveInk(null);
       return;
     }
@@ -333,47 +334,18 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     inkProgress.value = 0;
     inkProgress.value = withTiming(
       1,
-      { duration: 460, easing: Easing.out(Easing.cubic) },
+      { duration: 420, easing: Easing.out(Easing.cubic) },
       (finished) => {
         if (finished) {
           runOnJS(setActiveInk)(null);
         }
       }
     );
-  }, [lastInkEvent, projectionMode, reduceMotion, engine2D, inkProgress]);
+  }, [lastInkEvent, reduceMotion, engine2D, inkProgress]);
 
   const inkRadius = useDerivedValue(() =>
     activeInk ? activeInk.maxR * inkProgress.value : 0
   );
-
-  // ---------- 3D Globe State (with release inertia) ----------
-  const defaultGlobe = useMemo(() => {
-    if (userProfile.homePlaceId && PLACE_BY_ID[userProfile.homePlaceId]) {
-      const c = PLACE_BY_ID[userProfile.homePlaceId].centroid;
-      return { lon: -c[0], lat: -clamp(c[1], -65, 65), scale: 1.05 };
-    }
-    return { lon: -10, lat: -40, scale: 1.05 };
-  }, [userProfile.homePlaceId]);
-
-  const [globeRot, setGlobeRot] = useState(defaultGlobe);
-  const hasUserMoved3DRef = useRef(false);
-  const globeStartRef = useRef(defaultGlobe);
-  const globeVelRef = useRef({ vLon: 0, vLat: 0 });
-  const globeRafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (hasUserMoved3DRef.current) return;
-    setGlobeRot(defaultGlobe);
-  }, [defaultGlobe]);
-
-  const stopGlobeInertia = useCallback(() => {
-    if (globeRafRef.current != null) {
-      cancelAnimationFrame(globeRafRef.current);
-      globeRafRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => () => stopGlobeInertia(), [stopGlobeInertia]);
 
   const syncSettledCamera = useCallback((s: number, x: number, y: number) => {
     hasUserMoved2DRef.current = true;
@@ -392,12 +364,13 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         setSettledCam(target);
         return;
       }
-      // Scale flight duration with camera distance so short hops feel crisp & long flights feel composed
       const distPx = Math.hypot(target.tx - tx.value, target.ty - ty.value);
-      const scaleDiff = Math.abs(Math.log(Math.max(0.1, target.scale) / Math.max(0.1, scale.value)));
+      const scaleDiff = Math.abs(
+        Math.log(Math.max(0.1, target.scale) / Math.max(0.1, scale.value))
+      );
       const duration =
         explicitDuration ??
-        Math.round(clamp(230 + distPx * 0.28 + scaleDiff * 110, 240, 540));
+        Math.round(clamp(220 + distPx * 0.25 + scaleDiff * 105, 220, 480));
 
       const easing = Easing.out(Easing.cubic);
       scale.value = withTiming(target.scale, { duration, easing });
@@ -411,126 +384,102 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     [scale, tx, ty, reduceMotion, syncSettledCamera]
   );
 
-  // Has camera moved meaningfully away from default? Drives the single Recenter button!
+  // Has camera moved meaningfully away from default? Drives the Recenter pill
   const cameraMoved = useMemo(() => {
-    if (projectionMode === '3d') {
-      return (
-        Math.abs(globeRot.lon - defaultGlobe.lon) > 14 ||
-        Math.abs(globeRot.lat - defaultGlobe.lat) > 14 ||
-        Math.abs(globeRot.scale - defaultGlobe.scale) > 0.22
-      );
-    }
     return (
-      Math.abs(settledCam.scale - initialCam.scale) > 0.25 ||
-      Math.hypot(settledCam.tx - initialCam.tx, settledCam.ty - initialCam.ty) > 48
+      Math.abs(settledCam.scale - initialCam.scale) > 0.18 ||
+      Math.hypot(settledCam.tx - initialCam.tx, settledCam.ty - initialCam.ty) > 44
     );
-  }, [projectionMode, globeRot, defaultGlobe, settledCam, initialCam]);
+  }, [settledCam, initialCam]);
 
   const handleRecenter = useCallback(() => {
     Haptics.selectionAsync();
-    if (projectionMode === '2d') {
-      animate2DCameraTo(initialCam);
-    } else {
-      stopGlobeInertia();
-      setGlobeRot(defaultGlobe);
-    }
-  }, [projectionMode, animate2DCameraTo, initialCam, stopGlobeInertia, defaultGlobe]);
+    animate2DCameraTo(initialCam);
+  }, [animate2DCameraTo, initialCam]);
 
-  // Respond to external camera requests (Search, Record continent jump, Year view, Place sheet framing)
+  // Respond to external camera requests once per request id (never re-fire stale requests on rotation!)
+  const lastHandledCameraReqIdRef = useRef<number>(0);
   useEffect(() => {
-    if (!cameraRequest) return;
+    if (!cameraRequest || cameraRequest.id === lastHandledCameraReqIdRef.current) return;
+    lastHandledCameraReqIdRef.current = cameraRequest.id;
 
     if (cameraRequest.type === 'reset') {
-      if (projectionMode === '2d') {
-        animate2DCameraTo(initialCam);
-      } else {
-        stopGlobeInertia();
-        setGlobeRot(defaultGlobe);
-      }
+      animate2DCameraTo(initialCam);
       return;
     }
 
     if (cameraRequest.type === 'bbox' && cameraRequest.bbox) {
-      if (projectionMode === '2d') {
-        const projBounds = projectGeoBboxTo2D(cameraRequest.bbox, engine2D.projection);
-        const target = fitProjectedBoundsToViewport(projBounds, { width, height }, {
-          top: safeInsets.top + 92,
+      const projBounds = projectGeoBboxTo2D(cameraRequest.bbox, engine2D.projection);
+      const target = fitProjectedBoundsToViewport(
+        projBounds,
+        { width, height },
+        {
+          top: safeInsets.top + (isLandscape ? 54 : 92),
           bottom:
             safeInsets.bottom +
-            (cameraRequest.withBottomSheetInset ? sheetHeight + 16 : 138),
-          left: 16,
-          right: 16,
-        });
-        animate2DCameraTo(target);
-      } else {
-        stopGlobeInertia();
-        const [minLon, minLat, maxLon, maxLat] = cameraRequest.bbox;
-        const midLon = (minLon + maxLon) / 2;
-        const midLat = (minLat + maxLat) / 2;
-        const span = Math.max(maxLon - minLon, maxLat - minLat);
-        const z = clamp(120 / Math.max(15, span), 1.0, 5.5);
-        setGlobeRot({ lon: -midLon, lat: -midLat, scale: z });
-      }
+            (cameraRequest.withBottomSheetInset
+              ? Math.min(height * 0.58, sheetHeight + 16)
+              : isLandscape
+              ? 64
+              : 138),
+          left: Math.max(16, safeInsets.left + 12),
+          right: Math.max(16, safeInsets.right + 12),
+        },
+        0.86,
+        minZoom,
+        24
+      );
+      animate2DCameraTo(target);
       return;
     }
 
     if (cameraRequest.type === 'place' && cameraRequest.placeId) {
       const place = PLACE_BY_ID[cameraRequest.placeId];
       if (!place) return;
-      if (projectionMode === '2d') {
-        const compiled = engine2D.placeById[place.id];
-        if (!compiled) return;
-        const b = compiled.projectedBounds;
-        const minPad = 14;
-        const padded = {
-          minX: b.minX - minPad,
-          minY: b.minY - minPad,
-          maxX: b.maxX + minPad,
-          maxY: b.maxY + minPad,
-        };
-        const target = fitProjectedBoundsToViewport(
-          padded,
-          { width, height },
-          {
-            top: safeInsets.top + 88,
-            bottom: cameraRequest.withBottomSheetInset
-              ? Math.min(height * 0.62, sheetHeight + 16)
-              : safeInsets.bottom + 138,
-            left: 24,
-            right: 24,
-          },
-          0.72,
-          MIN_ZOOM_2D,
-          14
-        );
-        animate2DCameraTo(target);
-      } else {
-        stopGlobeInertia();
-        setGlobeRot((prev) => ({
-          lon: -place.centroid[0],
-          lat: -clamp(place.centroid[1], -70, 70),
-          scale: Math.max(prev.scale, 1.85),
-        }));
-      }
+      const compiled = engine2D.placeById[place.id];
+      if (!compiled) return;
+      const b = compiled.projectedBounds;
+      const minPad = 14;
+      const padded = {
+        minX: b.minX - minPad,
+        minY: b.minY - minPad,
+        maxX: b.maxX + minPad,
+        maxY: b.maxY + minPad,
+      };
+      const target = fitProjectedBoundsToViewport(
+        padded,
+        { width, height },
+        {
+          top: safeInsets.top + (isLandscape ? 48 : 88),
+          bottom: cameraRequest.withBottomSheetInset
+            ? Math.min(height * (isLandscape ? 0.56 : 0.62), sheetHeight + 16)
+            : safeInsets.bottom + (isLandscape ? 64 : 138),
+          left: Math.max(24, safeInsets.left + 16),
+          right: Math.max(24, safeInsets.right + 16),
+        },
+        0.72,
+        minZoom,
+        14
+      );
+      animate2DCameraTo(target);
     }
   }, [
     cameraRequest,
-    projectionMode,
     engine2D,
     width,
     height,
+    isLandscape,
     safeInsets,
     sheetHeight,
     initialCam,
-    defaultGlobe,
-    stopGlobeInertia,
+    minZoom,
     animate2DCameraTo,
   ]);
 
-  // ---------- 2D Hit-Test Handler ----------
+  // ---------- 2D Hit-Test Handler (hits ALL 243 countries & territories!) ----------
   const handleTap2D = useCallback(
     (mapX: number, mapY: number, currentScale: number) => {
-      const hitId = hitTest2D(mapX, mapY, currentScale, userProfile.includeTerritories);
+      const hitId = hitTest2D(mapX, mapY, currentScale);
       if (hitId) {
         Haptics.selectionAsync();
         selectPlace(hitId, true, { mapX, mapY });
@@ -538,57 +487,36 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         selectPlace(null, false);
       }
     },
-    [userProfile.includeTerritories, selectPlace, selectedPlaceId]
+    [selectPlace, selectedPlaceId]
   );
 
-  // ---------- 2D Gesture Suite (Portrait-First) ----------
+  // ---------- Conflict-Free 2D Gesture Suite ----------
   const pan2D = useMemo(
     () =>
       Gesture.Pan()
+        .minPointers(1)
         .maxPointers(1)
-        .onBegin((e) => {
+        .minDistance(8)
+        .onStart((e) => {
+          if (isPinching.value) return;
           cancelAnimation(tx);
           cancelAnimation(ty);
           cancelAnimation(scale);
-
-          const now = Date.now();
-          const dist = Math.hypot(e.x - lastTapX.value, e.y - lastTapY.value);
-          if (now - lastTapTs.value < 340 && dist < 52) {
-            oneFingerZoomActive.value = true;
-            oneFingerStartScale.value = scale.value;
-            oneFingerStartTx.value = tx.value;
-            oneFingerStartTy.value = ty.value;
-          } else {
-            oneFingerZoomActive.value = false;
-            panStartTx.value = tx.value;
-            panStartTy.value = ty.value;
-          }
+          panLastTransX.value = e.translationX;
+          panLastTransY.value = e.translationY;
         })
         .onUpdate((e) => {
-          if (oneFingerZoomActive.value) {
-            const factor = Math.exp(e.translationY * 0.0085);
-            const nextCam = zoomAroundFocalPoint(
-              {
-                scale: oneFingerStartScale.value,
-                tx: oneFingerStartTx.value,
-                ty: oneFingerStartTy.value,
-              },
-              oneFingerStartScale.value * factor,
-              lastTapX.value,
-              lastTapY.value
-            );
-            const clamped = clampCameraToBounds(nextCam, { width, height });
-            scale.value = clamped.scale;
-            tx.value = clamped.tx;
-            ty.value = clamped.ty;
-            return;
-          }
+          if (isPinching.value) return;
+          const dx = e.translationX - panLastTransX.value;
+          const dy = e.translationY - panLastTransY.value;
+          panLastTransX.value = e.translationX;
+          panLastTransY.value = e.translationY;
 
           const clamped = clampCameraToBounds(
             {
               scale: scale.value,
-              tx: panStartTx.value + e.translationX,
-              ty: panStartTy.value + e.translationY,
+              tx: tx.value + dx,
+              ty: ty.value + dy,
             },
             { width, height }
           );
@@ -596,8 +524,9 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           ty.value = clamped.ty;
         })
         .onEnd((e) => {
-          if (oneFingerZoomActive.value) {
-            oneFingerZoomActive.value = false;
+          if (isPinching.value) return;
+          const speed = Math.hypot(e.velocityX, e.velocityY);
+          if (reduceMotion || speed < 65) {
             runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
             return;
           }
@@ -611,20 +540,35 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           const minTy = Math.min(height - scaledH - marginY, marginY);
           const maxTy = Math.max(height - scaledH - marginY, marginY);
 
-          tx.value = withDecay({
-            velocity: e.velocityX * 0.85,
-            deceleration: 0.994,
-            clamp: [minTx, maxTx],
-          });
+          const xDominant = Math.abs(e.velocityX) >= Math.abs(e.velocityY);
+
+          tx.value = withDecay(
+            {
+              velocity: e.velocityX * 0.82,
+              deceleration: 0.993,
+              clamp: [minTx, maxTx],
+            },
+            xDominant
+              ? (finished) => {
+                  if (finished) {
+                    runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+                  }
+                }
+              : undefined
+          );
           ty.value = withDecay(
             {
-              velocity: e.velocityY * 0.85,
-              deceleration: 0.994,
+              velocity: e.velocityY * 0.82,
+              deceleration: 0.993,
               clamp: [minTy, maxTy],
             },
-            () => {
-              runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
-            }
+            !xDominant
+              ? (finished) => {
+                  if (finished) {
+                    runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+                  }
+                }
+              : undefined
           );
         }),
     [
@@ -633,15 +577,10 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
       tx,
       ty,
       scale,
-      panStartTx,
-      panStartTy,
-      lastTapTs,
-      lastTapX,
-      lastTapY,
-      oneFingerZoomActive,
-      oneFingerStartScale,
-      oneFingerStartTx,
-      oneFingerStartTy,
+      isPinching,
+      panLastTransX,
+      panLastTransY,
+      reduceMotion,
       syncSettledCamera,
     ]
   );
@@ -649,7 +588,8 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   const pinch2D = useMemo(
     () =>
       Gesture.Pinch()
-        .onBegin((e) => {
+        .onStart((e) => {
+          isPinching.value = true;
           cancelAnimation(scale);
           cancelAnimation(tx);
           cancelAnimation(ty);
@@ -670,22 +610,27 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
             },
             pinchStartScale.value * e.scale,
             e.focalX,
-            e.focalY
+            e.focalY,
+            minZoom,
+            24.0
           );
           const clamped = clampCameraToBounds(zoomed, { width, height });
           scale.value = clamped.scale;
           tx.value = clamped.tx;
           ty.value = clamped.ty;
         })
-        .onEnd(() => {
+        .onFinalize(() => {
+          isPinching.value = false;
           runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
         }),
     [
       width,
       height,
+      minZoom,
       scale,
       tx,
       ty,
+      isPinching,
       pinchStartScale,
       pinchStartTx,
       pinchStartTy,
@@ -699,40 +644,46 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     () =>
       Gesture.Tap()
         .numberOfTaps(2)
-        .maxDelay(280)
+        .maxDelay(190)
+        .maxDistance(24)
         .onEnd((e, success) => {
-          if (!success || oneFingerZoomActive.value) return;
+          if (!success) return;
+          cancelAnimation(scale);
+          cancelAnimation(tx);
+          cancelAnimation(ty);
           const target = clampCameraToBounds(
             zoomAroundFocalPoint(
               { scale: scale.value, tx: tx.value, ty: ty.value },
-              scale.value * 2.35,
+              scale.value * 2.25,
               e.x,
-              e.y
+              e.y,
+              minZoom,
+              24.0
             ),
             { width, height }
           );
-          const d = reduceMotion ? 0 : 250;
+          const d = reduceMotion ? 0 : 230;
           scale.value = withTiming(target.scale, { duration: d });
           tx.value = withTiming(target.tx, { duration: d });
-          ty.value = withTiming(target.ty, { duration: d }, () => {
-            runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
+          ty.value = withTiming(target.ty, { duration: d }, (finished) => {
+            if (finished) {
+              runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
+            }
           });
         }),
-    [width, height, scale, tx, ty, oneFingerZoomActive, reduceMotion, syncSettledCamera]
+    [width, height, minZoom, scale, tx, ty, reduceMotion, syncSettledCamera]
   );
 
   const singleTap2D = useMemo(
     () =>
       Gesture.Tap()
         .numberOfTaps(1)
-        .maxDistance(12)
-        .onBegin((e) => {
-          lastTapTs.value = Date.now();
-          lastTapX.value = e.x;
-          lastTapY.value = e.y;
-        })
+        .maxDistance(20)
+        .maxDuration(340)
         .onEnd((e, success) => {
           if (!success) return;
+          cancelAnimation(tx);
+          cancelAnimation(ty);
           const pt = screenToMapPoint(e.x, e.y, {
             scale: scale.value,
             tx: tx.value,
@@ -740,33 +691,41 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           });
           runOnJS(handleTap2D)(pt.x, pt.y, scale.value);
         }),
-    [scale, tx, ty, lastTapTs, lastTapX, lastTapY, handleTap2D]
+    [scale, tx, ty, handleTap2D]
   );
 
   const twoFingerTap2D = useMemo(
     () =>
       Gesture.Tap()
         .minPointers(2)
-        .maxDuration(250)
+        .maxDuration(240)
+        .maxDistance(24)
         .onEnd((e, success) => {
           if (!success) return;
+          cancelAnimation(scale);
+          cancelAnimation(tx);
+          cancelAnimation(ty);
           const target = clampCameraToBounds(
             zoomAroundFocalPoint(
               { scale: scale.value, tx: tx.value, ty: ty.value },
               scale.value * 0.5,
               e.x,
-              e.y
+              e.y,
+              minZoom,
+              24.0
             ),
             { width, height }
           );
-          const d = reduceMotion ? 0 : 230;
+          const d = reduceMotion ? 0 : 220;
           scale.value = withTiming(target.scale, { duration: d });
           tx.value = withTiming(target.tx, { duration: d });
-          ty.value = withTiming(target.ty, { duration: d }, () => {
-            runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
+          ty.value = withTiming(target.ty, { duration: d }, (finished) => {
+            if (finished) {
+              runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
+            }
           });
         }),
-    [width, height, scale, tx, ty, reduceMotion, syncSettledCamera]
+    [width, height, minZoom, scale, tx, ty, reduceMotion, syncSettledCamera]
   );
 
   const composed2DGesture = useMemo(
@@ -779,200 +738,29 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     [pinch2D, pan2D, twoFingerTap2D, doubleTap2D, singleTap2D]
   );
 
-  // ---------- 3D Globe Gesture Suite ----------
-  const globeBaseRadius = Math.min(width, height) * 0.43;
-  const globeCenterX = width / 2;
-  const globeCenterY = selectedPlaceId ? height * 0.32 : height * 0.48;
-  const globeRadiusPx = globeBaseRadius * globeRot.scale;
-
-  const globeProjection = useMemo(
-    () =>
-      createGlobeProjection(
-        globeCenterX,
-        globeCenterY,
-        globeRadiusPx,
-        globeRot.lon,
-        globeRot.lat
-      ),
-    [globeCenterX, globeCenterY, globeRadiusPx, globeRot]
-  );
-
-  const globePaths = useMemo(() => {
-    if (projectionMode !== '3d') return null;
-    const pathGen = d3Geo.geoPath(globeProjection);
-    const sphereSvg = pathGen({ type: 'Sphere' }) ?? '';
-    const gratSvg = pathGen(d3Geo.geoGraticule10()) ?? '';
-    const features = getWorldFeatures();
-
-    const items: {
-      id: string;
-      skPath: ReturnType<typeof Skia.Path.Make>;
-      centroid: [number, number] | null;
-    }[] = [];
-    for (const f of features) {
-      const id = f.properties?.id || String(f.id ?? '');
-      const svg = pathGen(f);
-      if (!svg) continue;
-      const p = Skia.Path.MakeFromSVGString(svg);
-      if (!p) continue;
-      const pMeta = PLACE_BY_ID[id];
-      let centroid: [number, number] | null = null;
-      if (pMeta) {
-        const dist = d3Geo.geoDistance(pMeta.centroid, [-globeRot.lon, -globeRot.lat]);
-        if (dist < Math.PI / 2 - 0.08) {
-          const projPt = globeProjection(pMeta.centroid);
-          if (projPt && Number.isFinite(projPt[0]) && Number.isFinite(projPt[1])) {
-            centroid = [projPt[0], projPt[1]];
-          }
-        }
-      }
-      items.push({ id, skPath: p, centroid });
-    }
-    return {
-      sphere: Skia.Path.MakeFromSVGString(sphereSvg) ?? Skia.Path.Make(),
-      graticule: Skia.Path.MakeFromSVGString(gratSvg) ?? Skia.Path.Make(),
-      items,
-    };
-  }, [projectionMode, globeProjection, globeRot.lon, globeRot.lat]);
-
-  const handleGlobeDragStart = useCallback(() => {
-    stopGlobeInertia();
-    hasUserMoved3DRef.current = true;
-    globeStartRef.current = { ...globeRot };
-  }, [globeRot, stopGlobeInertia]);
-
-  const handleGlobeDragUpdate = useCallback((dx: number, dy: number) => {
-    const start = globeStartRef.current;
-    const sensitivity = 0.28 / Math.max(0.8, start.scale);
-    setGlobeRot({
-      lon: start.lon + dx * sensitivity,
-      lat: clamp(start.lat - dy * sensitivity, -78, 78),
-      scale: start.scale,
-    });
-  }, []);
-
-  const handleGlobeDragEnd = useCallback(
-    (vx: number, vy: number) => {
-      if (reduceMotion) return;
-      const sensitivity = 0.0045 / Math.max(0.8, globeStartRef.current.scale);
-      globeVelRef.current = {
-        vLon: clamp(vx * sensitivity, -6.5, 6.5),
-        vLat: clamp(-vy * sensitivity, -4.5, 4.5),
-      };
-      if (
-        Math.abs(globeVelRef.current.vLon) < 0.08 &&
-        Math.abs(globeVelRef.current.vLat) < 0.08
-      ) {
-        return;
-      }
-      const step = () => {
-        globeVelRef.current.vLon *= 0.92;
-        globeVelRef.current.vLat *= 0.92;
-        const { vLon, vLat } = globeVelRef.current;
-        if (Math.abs(vLon) < 0.04 && Math.abs(vLat) < 0.04) {
-          globeRafRef.current = null;
-          return;
-        }
-        setGlobeRot((prev) => ({
-          lon: prev.lon + vLon,
-          lat: clamp(prev.lat + vLat, -78, 78),
-          scale: prev.scale,
-        }));
-        globeRafRef.current = requestAnimationFrame(step);
-      };
-      globeRafRef.current = requestAnimationFrame(step);
-    },
-    [reduceMotion]
-  );
-
-  const handleGlobePinchUpdate = useCallback((pinchScale: number) => {
-    const start = globeStartRef.current;
-    setGlobeRot({
-      lon: start.lon,
-      lat: start.lat,
-      scale: clamp(start.scale * pinchScale, 0.85, 7.5),
-    });
-  }, []);
-
-  const handleTap3D = useCallback(
-    (x: number, y: number) => {
-      const hitId = hitTest3D(x, y, globeProjection, userProfile.includeTerritories);
-      if (hitId) {
-        Haptics.selectionAsync();
-        selectPlace(hitId, false);
-      } else if (selectedPlaceId) {
-        selectPlace(null, false);
-      }
-    },
-    [globeProjection, userProfile.includeTerritories, selectPlace, selectedPlaceId]
-  );
-
-  const composed3DGesture = useMemo(() => {
-    const pan3D = Gesture.Pan()
-      .maxPointers(1)
-      .onBegin(() => {
-        runOnJS(handleGlobeDragStart)();
-      })
-      .onUpdate((e) => {
-        runOnJS(handleGlobeDragUpdate)(e.translationX, e.translationY);
-      })
-      .onEnd((e) => {
-        runOnJS(handleGlobeDragEnd)(e.velocityX, e.velocityY);
-      });
-
-    const pinch3D = Gesture.Pinch()
-      .onBegin(() => {
-        runOnJS(handleGlobeDragStart)();
-      })
-      .onUpdate((e) => {
-        runOnJS(handleGlobePinchUpdate)(e.scale);
-      });
-
-    const tap3D = Gesture.Tap()
-      .numberOfTaps(1)
-      .maxDistance(12)
-      .onEnd((e, success) => {
-        if (!success) return;
-        runOnJS(handleTap3D)(e.x, e.y);
-      });
-
-    return Gesture.Simultaneous(pinch3D, pan3D, tap3D);
-  }, [
-    handleGlobeDragStart,
-    handleGlobeDragUpdate,
-    handleGlobeDragEnd,
-    handleGlobePinchUpdate,
-    handleTap3D,
-  ]);
-
-  // ---------- VoiceOver Map Accessibility Actions (replaces +/- buttons) ----------
+  // ---------- VoiceOver Map Accessibility Actions ----------
   const handleAccessibilityAction = useCallback(
     (event: AccessibilityActionEvent) => {
       const action = event.nativeEvent.actionName;
       if (action === 'zoomIn' || action === 'zoomOut') {
         const mult = action === 'zoomIn' ? 1.75 : 0.58;
-        if (projectionMode === '2d') {
-          const target = clampCameraToBounds(
-            zoomAroundFocalPoint(
-              { scale: scale.value, tx: tx.value, ty: ty.value },
-              scale.value * mult,
-              width / 2,
-              height * 0.46
-            ),
-            { width, height }
-          );
-          animate2DCameraTo(target, 220);
-        } else {
-          setGlobeRot((prev) => ({
-            ...prev,
-            scale: clamp(prev.scale * mult, 0.85, 7.5),
-          }));
-        }
+        const target = clampCameraToBounds(
+          zoomAroundFocalPoint(
+            { scale: scale.value, tx: tx.value, ty: ty.value },
+            scale.value * mult,
+            width / 2,
+            height * 0.46,
+            minZoom,
+            24.0
+          ),
+          { width, height }
+        );
+        animate2DCameraTo(target, 220);
       } else if (action === 'recenter') {
         handleRecenter();
       }
     },
-    [projectionMode, scale, tx, ty, width, height, animate2DCameraTo, handleRecenter]
+    [scale, tx, ty, width, height, minZoom, animate2DCameraTo, handleRecenter]
   );
 
   // ---------- Skia Derived Transforms, Strokes & Hatch Uniforms ----------
@@ -984,35 +772,29 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
 
   const adaptiveStroke = useDerivedValue(() => computeAdaptiveStrokeWidth(scale.value, 0.9));
   const selectedStrokeOuter = useDerivedValue(() =>
-    clamp(3.0 / Math.max(1, scale.value), 0.28, 2.8)
+    clamp(3.0 / Math.max(0.5, scale.value), 0.28, 3.2)
   );
   const selectedStrokeInner = useDerivedValue(() =>
-    clamp(1.3 / Math.max(1, scale.value), 0.14, 1.25)
+    clamp(1.3 / Math.max(0.5, scale.value), 0.14, 1.45)
   );
   const livedDotRadius = useDerivedValue(() =>
-    clamp(3.2 / Math.pow(scale.value, 0.72), 0.55, 3.2)
+    clamp(3.2 / Math.pow(Math.max(0.6, scale.value), 0.72), 0.55, 3.5)
   );
   const pinRadius = useDerivedValue(() =>
-    clamp(2.8 / Math.pow(scale.value, 0.72), 0.5, 2.8)
+    clamp(2.8 / Math.pow(Math.max(0.6, scale.value), 0.72), 0.5, 3.0)
   );
 
-  // Zoom-invariant diagonal hatching uniforms on the 2D canvas
   const hatchBgVec = useMemo(() => hexToColorVec4(theme.landUnvisited, 1), [theme.landUnvisited]);
   const hatchInkVec = useMemo(() => hexToColorVec4(theme.landWishlist, 0.86), [theme.landWishlist]);
   const hatchUniforms2D = useDerivedValue(() => {
-    const inv = 1 / Math.max(1, scale.value);
+    const inv = 1 / Math.max(0.6, scale.value);
     return {
       bgColor: hatchBgVec,
       inkColor: hatchInkVec,
-      spacing: clamp(5.8 * inv, 0.35, 6.2),
-      strokeWidth: clamp(1.3 * inv, 0.08, 1.35),
+      spacing: clamp(5.8 * inv, 0.35, 7.2),
+      strokeWidth: clamp(1.3 * inv, 0.08, 1.55),
     };
   });
-
-  const hatchUniforms3D = useMemo(
-    () => buildHatchUniforms(theme.landUnvisited, theme.landWishlist, 5.8, 1.3),
-    [theme.landUnvisited, theme.landWishlist]
-  );
 
   // ---------- Place Visual Classification ----------
   const getPlaceVisual = useCallback(
@@ -1040,6 +822,11 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         return { kind: 'solid', color: theme.landDimmed, isLived: false };
       }
 
+      if (overlayMode === 'skipped') {
+        if (status === 'skipped') return { kind: 'solid', color: theme.landSkipped, isLived: false };
+        return { kind: 'solid', color: theme.landDimmed, isLived: false };
+      }
+
       if (overlayMode === 'favorites') {
         if (!userPlaces[placeId]?.isFavorite) {
           return { kind: 'solid', color: theme.landDimmed, isLived: false };
@@ -1047,12 +834,14 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         if (status === 'lived') return { kind: 'solid', color: theme.landLived, isLived: true };
         if (status === 'visited') return { kind: 'solid', color: theme.landVisited, isLived: false };
         if (status === 'wishlist') return { kind: 'hatch', color: theme.landUnvisited, isLived: false };
+        if (status === 'skipped') return { kind: 'solid', color: theme.landSkipped, isLived: false };
         return { kind: 'solid', color: theme.landUnvisited, isLived: false };
       }
 
       if (status === 'lived') return { kind: 'solid', color: theme.landLived, isLived: true };
       if (status === 'visited') return { kind: 'solid', color: theme.landVisited, isLived: false };
       if (status === 'wishlist') return { kind: 'hatch', color: theme.landUnvisited, isLived: false };
+      if (status === 'skipped') return { kind: 'solid', color: theme.landSkipped, isLived: false };
       return { kind: 'solid', color: theme.landUnvisited, isLived: false };
     },
     [
@@ -1065,33 +854,36 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     ]
   );
 
-  // ---------- Greedy Collision-Free Live Skia Labels ----------
+  // ---------- Greedy Collision-Free Live Skia Labels (ALL 243 countries & territories!) ----------
   const visibleLabels = useMemo<LabelCandidate[]>(() => {
-    if (projectionMode !== '2d' || settledCam.scale < 1.35 || !labelFont) return [];
+    if (settledCam.scale < 1.3 || !labelFont) return [];
     const candidates: (LabelCandidate & { sx: number; sy: number; priority: number })[] = [];
 
+    const topEdge = safeInsets.top + (isLandscape ? 52 : 86);
+    const bottomEdge = height - Math.max(safeInsets.bottom, 12) - (isLandscape ? 60 : 134);
+
     for (const item of engine2D.places) {
-      if (!userProfile.includeTerritories && !item.place.isUnMember) continue;
       const sx = item.projectedCentroid[0] * settledCam.scale + settledCam.tx;
       const sy = item.projectedCentroid[1] * settledCam.scale + settledCam.ty;
       const textWidth = labelFont.measureText(item.place.name).width;
       const halfW = textWidth / 2;
       if (
-        sx - halfW < 12 ||
-        sx + halfW > width - 12 ||
-        sy < safeInsets.top + 86 ||
-        sy > height - Math.max(safeInsets.bottom, 12) - 134
+        sx - halfW < Math.max(12, safeInsets.left + 8) ||
+        sx + halfW > width - Math.max(12, safeInsets.right + 8) ||
+        sy < topEdge ||
+        sy > bottomEdge
       ) {
         continue;
       }
 
       const screenW = item.projectedWidth * settledCam.scale;
       const isUk = item.place.parentId === 'GB';
-      const minW = isUk ? 24 : 44;
+      const minW = isUk ? 24 : 42;
       if (screenW < minW && item.id !== selectedPlaceId) continue;
 
       const status = userPlaces[item.id]?.status ?? 'none';
       const isDimmed =
+        status === 'skipped' ||
         (overlayMode === 'visited' && status !== 'visited' && status !== 'lived') ||
         (overlayMode === 'wishlist' && status !== 'wishlist') ||
         (overlayMode === 'favorites' && !userPlaces[item.id]?.isFavorite) ||
@@ -1103,7 +895,12 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         if (status === 'lived') {
           textColor = theme.labelOnLived;
           haloColor = theme.labelHaloOnLived;
-        } else if (status === 'visited' || (overlayMode === 'year' && activeYearPlaceIds.has(item.id) && activeYearCollection?.collectionType !== 'planned')) {
+        } else if (
+          status === 'visited' ||
+          (overlayMode === 'year' &&
+            activeYearPlaceIds.has(item.id) &&
+            activeYearCollection?.collectionType !== 'planned')
+        ) {
           textColor = theme.labelOnVisited;
           haloColor = theme.labelHaloOnVisited;
         }
@@ -1119,20 +916,19 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         textWidth,
         textColor,
         haloColor,
-        opacity: isDimmed ? 0.42 : 0.94,
+        opacity: isDimmed ? 0.44 : 0.94,
         sx,
         sy,
         priority:
           (item.id === selectedPlaceId ? -1000 : 0) +
           (isUk ? -120 : 0) +
-          (status !== 'none' ? -40 : 0) +
+          (status !== 'none' && status !== 'skipped' ? -40 : 0) +
           distFromCenter,
       });
     }
 
     candidates.sort((a, b) => a.priority - b.priority);
 
-    // Greedy screen-space bounding-box collision rejection (prevents WalEngland / NorwSweden!)
     const placed: typeof candidates = [];
     for (const c of candidates) {
       if (placed.length >= 22) break;
@@ -1150,50 +946,50 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
 
     return placed;
   }, [
-    projectionMode,
     settledCam,
     labelFont,
     engine2D.places,
-    userProfile.includeTerritories,
     userPlaces,
     overlayMode,
     activeYearPlaceIds,
     activeYearCollection,
     width,
     height,
+    isLandscape,
     safeInsets.top,
     safeInsets.bottom,
+    safeInsets.left,
+    safeInsets.right,
     selectedPlaceId,
     theme,
   ]);
 
   const selectedCompiled2D = selectedPlaceId ? engine2D.placeById[selectedPlaceId] : null;
   const activeInkCompiled = activeInk ? engine2D.placeById[activeInk.placeId] : null;
-  const selectedGlobeItem =
-    globePaths && selectedPlaceId
-      ? globePaths.items.find((i) => i.id === selectedPlaceId) ?? null
-      : null;
 
   const toggleOverlayFilter = (mode: Exclude<MapOverlayMode, 'all' | 'year'>) => {
     Haptics.selectionAsync();
     setOverlayMode(overlayMode === mode ? 'all' : mode);
   };
 
-  const bottomHudOffset = Math.max(safeInsets.bottom, 12) + (Platform.OS === 'ios' ? 76 : 72);
+  const bottomHudOffset = isLandscape
+    ? Math.max(safeInsets.bottom, 10) + (Platform.OS === 'ios' ? 46 : 44)
+    : Math.max(safeInsets.bottom, 12) + (Platform.OS === 'ios' ? 76 : 72);
+
+  const hudLeft = Math.max(16, safeInsets.left + 12);
+  const hudRight = Math.max(16, safeInsets.right + 12);
 
   return (
     <View
       style={[styles.container, { backgroundColor: theme.ocean }]}
       accessible={false}
     >
-      {/* Full-Bleed Interactive Map / Globe Canvas */}
-      <GestureDetector
-        gesture={projectionMode === '2d' ? composed2DGesture : composed3DGesture}
-      >
+      {/* Full-Bleed 60fps 2D Interactive Map Canvas */}
+      <GestureDetector gesture={composed2DGesture}>
         <View
           style={styles.canvasWrap}
           accessibilityLabel={`World travel map, ${stats.visitedCount} of ${stats.totalCount} countries visited`}
-          accessibilityHint="Pinch to zoom, drag to pan, double-tap a country or tap to inspect"
+          accessibilityHint="Pinch to zoom, drag to pan, double-tap to zoom in, tap any country or territory to inspect"
           accessibilityActions={[
             { name: 'zoomIn', label: 'Zoom in' },
             { name: 'zoomOut', label: 'Zoom out' },
@@ -1202,325 +998,200 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           onAccessibilityAction={handleAccessibilityAction}
         >
           <Canvas style={styles.canvas}>
-            {projectionMode === '2d' ? (
-              <>
-                <Group transform={groupTransform}>
-                  {/* Continuous single-ocean graticule + thin cartographic neatline (zero ocean cutoff!) */}
-                  <Path
-                    path={engine2D.graticulePath}
-                    color={theme.graticule}
-                    style="stroke"
-                    strokeWidth={0.45}
-                  />
-                  <Path
-                    path={engine2D.spherePath}
-                    color={theme.graticule}
-                    style="stroke"
-                    strokeWidth={0.75}
-                  />
+            <Group transform={groupTransform}>
+              {/* Continuous single-ocean graticule + thin cartographic neatline */}
+              <Path
+                path={engine2D.graticulePath}
+                color={theme.graticule}
+                style="stroke"
+                strokeWidth={0.45}
+              />
+              <Path
+                path={engine2D.spherePath}
+                color={theme.graticule}
+                style="stroke"
+                strokeWidth={0.75}
+              />
 
-                  {/* Landfills + Coastline Borders */}
-                  {engine2D.places.map((item) => {
-                    const visual = getPlaceVisual(item.id);
-                    const isFlooding = activeInk?.placeId === item.id;
-                    return (
-                      <React.Fragment key={item.id}>
-                        {isFlooding ? (
-                          <Path path={item.skPath} color={theme.landUnvisited} />
-                        ) : visual.kind === 'hatch' && hatchEffect ? (
-                          <Path path={item.skPath}>
-                            <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
-                          </Path>
-                        ) : (
-                          <Path
-                            path={item.skPath}
-                            color={
-                              visual.kind === 'hatch'
-                                ? theme.accentSoft
-                                : visual.color
-                            }
-                          />
-                        )}
-                        <Path
-                          path={item.skPath}
-                          color={theme.border}
-                          style="stroke"
-                          strokeWidth={adaptiveStroke}
-                          strokeJoin="round"
-                          strokeCap="round"
-                        />
-                      </React.Fragment>
-                    );
-                  })}
-
-                  {/* Signature Skia Ink-Flood Animation (clipped to country coastline!) */}
-                  {activeInk && activeInkCompiled && (
-                    <Group clip={activeInkCompiled.skPath}>
-                      {activeInk.status === 'wishlist' && hatchEffect ? (
-                        <Circle cx={activeInk.cx} cy={activeInk.cy} r={inkRadius}>
-                          <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
-                        </Circle>
-                      ) : (
-                        <Circle
-                          cx={activeInk.cx}
-                          cy={activeInk.cy}
-                          r={inkRadius}
-                          color={
-                            activeInk.status === 'lived'
-                              ? theme.landLived
-                              : theme.landVisited
-                          }
-                        />
-                      )}
+              {/* Landfills + Coastline Borders */}
+              {engine2D.places.map((item) => {
+                const visual = getPlaceVisual(item.id);
+                const isFlooding = activeInk?.placeId === item.id;
+                return (
+                  <React.Fragment key={item.id}>
+                    {isFlooding ? (
+                      <Path path={item.skPath} color={theme.landUnvisited} />
+                    ) : visual.kind === 'hatch' && hatchEffect ? (
+                      <Path path={item.skPath}>
+                        <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
+                      </Path>
+                    ) : (
                       <Path
-                        path={activeInkCompiled.skPath}
-                        color={theme.border}
-                        style="stroke"
-                        strokeWidth={adaptiveStroke}
-                        strokeJoin="round"
-                        strokeCap="round"
-                      />
-                    </Group>
-                  )}
-
-                  {/* Solid Centroid Dot for "Lived" countries (secondary visual cue) */}
-                  {engine2D.places.map((item) => {
-                    const visual = getPlaceVisual(item.id);
-                    if (!visual.isLived) return null;
-                    return (
-                      <Circle
-                        key={`lived-${item.id}`}
-                        cx={item.projectedCentroid[0]}
-                        cy={item.projectedCentroid[1]}
-                        r={livedDotRadius}
-                        color={theme.livedDot}
-                      />
-                    );
-                  })}
-
-                  {/* Microstate dots — shown only when marked or zoomed past 2.8x */}
-                  {engine2D.places.map((item) => {
-                    if (!item.place.isMicrostate) return null;
-                    if (!userProfile.includeTerritories && !item.place.isUnMember) return null;
-                    const status = userPlaces[item.id]?.status ?? 'none';
-                    if (status === 'none' && settledCam.scale < 2.8) return null;
-                    const dotColor =
-                      status === 'visited'
-                        ? theme.landVisited
-                        : status === 'lived'
-                        ? theme.landLived
-                        : status === 'wishlist'
-                        ? theme.landWishlist
-                        : theme.border;
-                    return (
-                      <Circle
-                        key={`pin-${item.id}`}
-                        cx={item.projectedCentroid[0]}
-                        cy={item.projectedCentroid[1]}
-                        r={pinRadius}
-                        color={dotColor}
-                      />
-                    );
-                  })}
-
-                  {/* Cased Selection Outline (drawn last with round joins — zero Hebrides miter blob!) */}
-                  {selectedCompiled2D && (
-                    <>
-                      <Path
-                        path={selectedCompiled2D.skPath}
-                        color={theme.borderSelectedOuter}
-                        style="stroke"
-                        strokeWidth={selectedStrokeOuter}
-                        strokeJoin="round"
-                        strokeCap="round"
-                      />
-                      <Path
-                        path={selectedCompiled2D.skPath}
-                        color={theme.borderSelected}
-                        style="stroke"
-                        strokeWidth={selectedStrokeInner}
-                        strokeJoin="round"
-                        strokeCap="round"
-                      />
-                    </>
-                  )}
-                </Group>
-
-                {/* Starred Favourite Place Markers tracking at 60fps in screen space */}
-                {engine2D.places.map((item) => {
-                  const up = userPlaces[item.id];
-                  if (!up?.isFavorite || up.deletedAt) return null;
-                  if (overlayMode === 'year' && !activeYearPlaceIds.has(item.id)) return null;
-                  if (
-                    overlayMode === 'visited' &&
-                    up.status !== 'visited' &&
-                    up.status !== 'lived'
-                  ) {
-                    return null;
-                  }
-                  if (overlayMode === 'wishlist' && up.status !== 'wishlist') return null;
-                  return (
-                    <LiveStarMarker2D
-                      key={`star-${item.id}`}
-                      mapX={item.projectedCentroid[0]}
-                      mapY={item.projectedCentroid[1]}
-                      scale={scale}
-                      tx={tx}
-                      ty={ty}
-                      fillColor={theme.favoriteAccent}
-                      haloColor={theme.surface}
-                    />
-                  );
-                })}
-
-                {/* Live 60fps Stroked-Halo Skia Labels tracking the camera on the UI thread */}
-                {labelFont &&
-                  visibleLabels.map((lbl) => (
-                    <LiveSkiaLabel
-                      key={lbl.id}
-                      label={lbl}
-                      font={labelFont}
-                      scale={scale}
-                      tx={tx}
-                      ty={ty}
-                    />
-                  ))}
-              </>
-            ) : (
-              globePaths && (
-                <Group>
-                  {/* Soft Atmospheric Rim */}
-                  <Circle
-                    cx={globeCenterX}
-                    cy={globeCenterY}
-                    r={globeRadiusPx}
-                    color={theme.oceanAtmosphere}
-                  >
-                    <BlurMask blur={18} style="outer" />
-                  </Circle>
-
-                  {/* Ocean Sphere + Radial Limb Darkening */}
-                  <Path path={globePaths.sphere} color={theme.oceanHighlight} />
-                  <Group clip={globePaths.sphere}>
-                    <Path
-                      path={globePaths.graticule}
-                      color={theme.graticule}
-                      style="stroke"
-                      strokeWidth={0.6}
-                    />
-
-                    {globePaths.items.map((item) => {
-                      const visual = getPlaceVisual(item.id);
-                      return (
-                        <React.Fragment key={item.id}>
-                          {visual.kind === 'hatch' && hatchEffect ? (
-                            <Path path={item.skPath}>
-                              <Shader source={hatchEffect} uniforms={hatchUniforms3D} />
-                            </Path>
-                          ) : (
-                            <Path
-                              path={item.skPath}
-                              color={
-                                visual.kind === 'hatch' ? theme.accentSoft : visual.color
-                              }
-                            />
-                          )}
-                          <Path
-                            path={item.skPath}
-                            color={theme.border}
-                            style="stroke"
-                            strokeWidth={0.65}
-                            strokeJoin="round"
-                            strokeCap="round"
-                          />
-                          {visual.isLived && item.centroid && !userPlaces[item.id]?.isFavorite && (
-                            <Circle
-                              cx={item.centroid[0]}
-                              cy={item.centroid[1]}
-                              r={3}
-                              color={theme.livedDot}
-                            />
-                          )}
-                          {userPlaces[item.id]?.isFavorite && item.centroid && (
-                            <Group
-                              transform={[
-                                { translateX: item.centroid[0] },
-                                { translateY: item.centroid[1] },
-                              ]}
-                            >
-                              <Path
-                                path={STAR_MARKER_PATH}
-                                color={theme.surface}
-                                style="stroke"
-                                strokeWidth={2.2}
-                                strokeJoin="round"
-                              />
-                              <Path
-                                path={STAR_MARKER_PATH}
-                                color={theme.favoriteAccent}
-                              />
-                            </Group>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-
-                    {/* Cased selection outline on 3D globe */}
-                    {selectedGlobeItem && (
-                      <>
-                        <Path
-                          path={selectedGlobeItem.skPath}
-                          color={theme.borderSelectedOuter}
-                          style="stroke"
-                          strokeWidth={2.8}
-                          strokeJoin="round"
-                          strokeCap="round"
-                        />
-                        <Path
-                          path={selectedGlobeItem.skPath}
-                          color={theme.borderSelected}
-                          style="stroke"
-                          strokeWidth={1.25}
-                          strokeJoin="round"
-                          strokeCap="round"
-                        />
-                      </>
-                    )}
-
-                    {/* Subtle Spherical Limb Vignette (direct child of Circle — no black base Paint!) */}
-                    <Circle cx={globeCenterX} cy={globeCenterY} r={globeRadiusPx}>
-                      <RadialGradient
-                        c={vec(
-                          globeCenterX - globeRadiusPx * 0.24,
-                          globeCenterY - globeRadiusPx * 0.24
-                        )}
-                        r={globeRadiusPx * 1.12}
-                        colors={
-                          theme.isDark
-                            ? ['rgba(255,255,255,0.06)', 'rgba(0,0,0,0)', 'rgba(3,10,20,0.42)']
-                            : ['rgba(255,255,255,0.18)', 'rgba(255,255,255,0)', 'rgba(20,38,54,0.22)']
+                        path={item.skPath}
+                        color={
+                          visual.kind === 'hatch' ? theme.accentSoft : visual.color
                         }
-                        positions={[0, 0.65, 1]}
                       />
-                    </Circle>
-                  </Group>
+                    )}
+                    <Path
+                      path={item.skPath}
+                      color={theme.border}
+                      style="stroke"
+                      strokeWidth={adaptiveStroke}
+                      strokeJoin="round"
+                      strokeCap="round"
+                    />
+                  </React.Fragment>
+                );
+              })}
 
-                  {/* Crisp Globe Rim */}
+              {/* Signature Skia Ink-Flood Animation (clipped to country coastline!) */}
+              {activeInk && activeInkCompiled && (
+                <Group clip={activeInkCompiled.skPath}>
+                  {activeInk.status === 'wishlist' && hatchEffect ? (
+                    <Circle cx={activeInk.cx} cy={activeInk.cy} r={inkRadius}>
+                      <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
+                    </Circle>
+                  ) : (
+                    <Circle
+                      cx={activeInk.cx}
+                      cy={activeInk.cy}
+                      r={inkRadius}
+                      color={
+                        activeInk.status === 'lived'
+                          ? theme.landLived
+                          : activeInk.status === 'skipped'
+                          ? theme.landSkipped
+                          : theme.landVisited
+                      }
+                    />
+                  )}
                   <Path
-                    path={globePaths.sphere}
-                    color={theme.cardBorder}
+                    path={activeInkCompiled.skPath}
+                    color={theme.border}
                     style="stroke"
-                    strokeWidth={1}
+                    strokeWidth={adaptiveStroke}
+                    strokeJoin="round"
+                    strokeCap="round"
                   />
                 </Group>
-              )
-            )}
+              )}
+
+              {/* Solid Centroid Dot for "Lived" countries */}
+              {engine2D.places.map((item) => {
+                const visual = getPlaceVisual(item.id);
+                if (!visual.isLived) return null;
+                return (
+                  <Circle
+                    key={`lived-${item.id}`}
+                    cx={item.projectedCentroid[0]}
+                    cy={item.projectedCentroid[1]}
+                    r={livedDotRadius}
+                    color={theme.livedDot}
+                  />
+                );
+              })}
+
+              {/* Microstate dots — shown for all microstates/territories when marked or zoomed past 2.5x */}
+              {engine2D.places.map((item) => {
+                if (!item.place.isMicrostate) return null;
+                const status = userPlaces[item.id]?.status ?? 'none';
+                if (status === 'none' && settledCam.scale < 2.5) return null;
+                const dotColor =
+                  status === 'visited'
+                    ? theme.landVisited
+                    : status === 'lived'
+                    ? theme.landLived
+                    : status === 'wishlist'
+                    ? theme.landWishlist
+                    : status === 'skipped'
+                    ? theme.skippedAccent
+                    : theme.border;
+                return (
+                  <Circle
+                    key={`pin-${item.id}`}
+                    cx={item.projectedCentroid[0]}
+                    cy={item.projectedCentroid[1]}
+                    r={pinRadius}
+                    color={dotColor}
+                  />
+                );
+              })}
+
+              {/* Cased Selection Outline (drawn last with round joins) */}
+              {selectedCompiled2D && (
+                <>
+                  <Path
+                    path={selectedCompiled2D.skPath}
+                    color={theme.borderSelectedOuter}
+                    style="stroke"
+                    strokeWidth={selectedStrokeOuter}
+                    strokeJoin="round"
+                    strokeCap="round"
+                  />
+                  <Path
+                    path={selectedCompiled2D.skPath}
+                    color={theme.borderSelected}
+                    style="stroke"
+                    strokeWidth={selectedStrokeInner}
+                    strokeJoin="round"
+                    strokeCap="round"
+                  />
+                </>
+              )}
+            </Group>
+
+            {/* Starred Favourite Place Markers tracking at 60fps in screen space */}
+            {engine2D.places.map((item) => {
+              const up = userPlaces[item.id];
+              if (!up?.isFavorite || up.deletedAt) return null;
+              if (overlayMode === 'year' && !activeYearPlaceIds.has(item.id)) return null;
+              if (
+                overlayMode === 'visited' &&
+                up.status !== 'visited' &&
+                up.status !== 'lived'
+              ) {
+                return null;
+              }
+              if (overlayMode === 'wishlist' && up.status !== 'wishlist') return null;
+              if (overlayMode === 'skipped' && up.status !== 'skipped') return null;
+              return (
+                <LiveStarMarker2D
+                  key={`star-${item.id}`}
+                  mapX={item.projectedCentroid[0]}
+                  mapY={item.projectedCentroid[1]}
+                  scale={scale}
+                  tx={tx}
+                  ty={ty}
+                  fillColor={theme.favoriteAccent}
+                  haloColor={theme.surface}
+                />
+              );
+            })}
+
+            {/* Live 60fps Stroked-Halo Skia Labels tracking the camera on the UI thread */}
+            {labelFont &&
+              visibleLabels.map((lbl) => (
+                <LiveSkiaLabel
+                  key={lbl.id}
+                  label={lbl}
+                  font={labelFont}
+                  scale={scale}
+                  tx={tx}
+                  ty={ty}
+                />
+              ))}
 
             {/* Gentle Top Vignette so Title Block stays effortlessly legible over coastlines */}
-            <Rect x={0} y={0} width={width} height={safeInsets.top + 88}>
+            <Rect
+              x={0}
+              y={0}
+              width={width}
+              height={safeInsets.top + (isLandscape ? 58 : 88)}
+            >
               <LinearGradient
                 start={vec(0, 0)}
-                end={vec(0, safeInsets.top + 88)}
+                end={vec(0, safeInsets.top + (isLandscape ? 58 : 88))}
                 colors={[theme.ocean, `${theme.ocean}CC`, `${theme.ocean}00`]}
                 positions={[0, 0.45, 1]}
               />
@@ -1529,9 +1200,16 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         </View>
       </GestureDetector>
 
-      {/* Quiet Top Title Block & Two Minimal Icon Actions */}
+      {/* Quiet Top Title Block & Single Search Action */}
       <View
-        style={[styles.topHud, { top: safeInsets.top + 8 }]}
+        style={[
+          styles.topHud,
+          {
+            top: safeInsets.top + (isLandscape ? 6 : 8),
+            left: hudLeft + 2,
+            right: hudRight,
+          },
+        ]}
         pointerEvents="box-none"
       >
         <View style={styles.titleBlock} pointerEvents="none">
@@ -1541,21 +1219,34 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
                 Tap a country you've been to
               </Text>
               <Text style={[styles.countSub, { color: theme.textSecondary }]}>
-                0 of {stats.totalCount} countries
+                0 of {stats.totalCount}{' '}
+                {userProfile.includeTerritories ? 'places' : 'countries'}
               </Text>
             </>
           ) : (
             <>
-              <Text style={[styles.countHeadline, { color: theme.textPrimary }]}>
+              <Text
+                style={[
+                  isLandscape ? styles.countHeadlineCompact : styles.countHeadline,
+                  { color: theme.textPrimary },
+                ]}
+              >
                 {stats.visitedCount}
-                <Text style={[styles.countDenom, { color: theme.textSecondary }]}>
+                <Text
+                  style={[
+                    isLandscape ? styles.countDenomCompact : styles.countDenom,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {' '}
                   of {stats.totalCount}
                 </Text>
               </Text>
-              <Text style={[styles.countSub, { color: theme.textSecondary }]}>
-                countries
-              </Text>
+              {!isLandscape && (
+                <Text style={[styles.countSub, { color: theme.textSecondary }]}>
+                  {userProfile.includeTerritories ? 'places' : 'countries'}
+                </Text>
+              )}
             </>
           )}
         </View>
@@ -1563,6 +1254,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         <View style={styles.topActions}>
           <Pressable
             onPress={onOpenSearch}
+            hitSlop={6}
             accessibilityRole="button"
             accessibilityLabel="Search places"
             style={({ pressed }) => [
@@ -1588,55 +1280,20 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
               />
             </BlurView>
           </Pressable>
-
-          <Pressable
-            onPress={() => {
-              Haptics.selectionAsync();
-              setProjectionMode(projectionMode === '2d' ? '3d' : '2d');
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={
-              projectionMode === '2d' ? 'Switch to 3D globe' : 'Switch to flat map'
-            }
-            style={({ pressed }) => [
-              styles.circleActionOuter,
-              {
-                borderColor: theme.cardBorder,
-                opacity: pressed ? 0.72 : 1,
-                backgroundColor:
-                  Platform.OS === 'android' ? theme.surfaceGlass : 'transparent',
-              },
-            ]}
-          >
-            <BlurView
-              intensity={64}
-              tint={theme.blurTint}
-              style={[styles.circleActionInner, { backgroundColor: theme.surfaceGlass }]}
-            >
-              {projectionMode === '2d' ? (
-                <Globe2
-                  size={18}
-                  color={theme.textPrimary}
-                  strokeWidth={1.8}
-                  absoluteStrokeWidth
-                />
-              ) : (
-                <MapIcon
-                  size={18}
-                  color={theme.textPrimary}
-                  strokeWidth={1.8}
-                  absoluteStrokeWidth
-                />
-              )}
-            </BlurView>
-          </Pressable>
         </View>
       </View>
 
-      {/* Bottom Legend-as-Filter & Conditional Recenter Pill (NO +/- stack, NO region strip) */}
+      {/* Bottom Legend-as-Filter & Conditional Recenter Pill */}
       {!selectedPlaceId && (
         <View
-          style={[styles.bottomRow, { bottom: bottomHudOffset }]}
+          style={[
+            styles.bottomRow,
+            {
+              bottom: bottomHudOffset,
+              left: hudLeft,
+              right: hudRight,
+            },
+          ]}
           pointerEvents="box-none"
         >
           {overlayMode === 'year' && activeYearCollection ? (
@@ -1645,6 +1302,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
                 Haptics.selectionAsync();
                 setOverlayMode('all');
               }}
+              hitSlop={6}
               accessibilityRole="button"
               accessibilityLabel={`Clear ${activeYearCollection.title} map filter`}
               style={({ pressed }) => [
@@ -1689,6 +1347,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
               >
                 <Pressable
                   onPress={() => toggleOverlayFilter('visited')}
+                  hitSlop={6}
                   accessibilityRole="button"
                   accessibilityState={{ selected: overlayMode === 'visited' }}
                   accessibilityLabel={`Filter visited countries, ${stats.visitedCount}`}
@@ -1725,6 +1384,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
 
                 <Pressable
                   onPress={() => toggleOverlayFilter('wishlist')}
+                  hitSlop={6}
                   accessibilityRole="button"
                   accessibilityState={{ selected: overlayMode === 'wishlist' }}
                   accessibilityLabel={`Filter want to go countries, ${stats.wishlistCount}`}
@@ -1776,6 +1436,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
                 {stats.favoritesCount > 0 && (
                   <Pressable
                     onPress={() => toggleOverlayFilter('favorites')}
+                    hitSlop={6}
                     accessibilityRole="button"
                     accessibilityState={{ selected: overlayMode === 'favorites' }}
                     accessibilityLabel={`Filter favourite places, ${stats.favoritesCount}`}
@@ -1818,6 +1479,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
             <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(150)}>
               <Pressable
                 onPress={handleRecenter}
+                hitSlop={6}
                 accessibilityRole="button"
                 accessibilityLabel="Recenter map"
                 style={({ pressed }) => [
@@ -1866,9 +1528,8 @@ const styles = StyleSheet.create({
   },
   topHud: {
     position: 'absolute',
-    left: 18,
-    right: 16,
-    zIndex: 20,
+    zIndex: 30,
+    elevation: 10,
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
@@ -1884,9 +1545,20 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: -0.4,
   },
+  countHeadlineCompact: {
+    fontFamily: FONTS.num,
+    fontSize: 22,
+    lineHeight: 26,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: -0.3,
+  },
   countDenom: {
     fontFamily: FONTS.numMedium,
     fontSize: 19,
+  },
+  countDenomCompact: {
+    fontFamily: FONTS.numMedium,
+    fontSize: 15,
   },
   emptyHeadline: {
     fontFamily: FONTS.display,
@@ -1918,9 +1590,8 @@ const styles = StyleSheet.create({
   },
   bottomRow: {
     position: 'absolute',
-    left: 16,
-    right: 16,
-    zIndex: 20,
+    zIndex: 30,
+    elevation: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1934,7 +1605,7 @@ const styles = StyleSheet.create({
   legendInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 4,
+    padding: 3,
     gap: 2,
   },
   legendBtn: {
@@ -1943,7 +1614,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingLeft: 10,
     paddingRight: 12,
-    height: 36,
+    height: 40,
     borderRadius: 999,
   },
   legendSwatch: {

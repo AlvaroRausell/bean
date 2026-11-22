@@ -76,4 +76,13 @@ describe('Portrait Camera & Navigation Math', () => {
     const cam = computePortraitInitialCamera(portraitViewport);
     expect(cam.scale).toBeGreaterThanOrEqual(MIN_ZOOM_2D);
   });
+
+  it('frames the entire world cleanly inside a landscape viewport', () => {
+    const landscape = { width: 874, height: 402 };
+    const cam = computePortraitInitialCamera(landscape);
+    expect(BASE_MAP_WIDTH * cam.scale).toBeLessThanOrEqual(landscape.width);
+    expect(BASE_MAP_HEIGHT * cam.scale).toBeLessThanOrEqual(landscape.height);
+    expect(cam.tx).toBeGreaterThanOrEqual(0);
+    expect(cam.ty).toBeGreaterThanOrEqual(0);
+  });
 });

@@ -29,7 +29,7 @@ export interface Place {
   searchAliases?: string[];
 }
 
-export type PlaceStatus = 'none' | 'visited' | 'wishlist' | 'lived';
+export type PlaceStatus = 'none' | 'visited' | 'wishlist' | 'lived' | 'skipped';
 
 export interface UserPlace {
   placeId: string;
@@ -78,7 +78,7 @@ export interface TravelGoal {
 export type CountingMode = 'uk_split_un' | 'un_strict';
 export type MapThemeId = 'midnight' | 'parchment' | 'ocean';
 export type MapProjectionMode = '2d' | '3d';
-export type MapOverlayMode = 'all' | 'visited' | 'wishlist' | 'favorites' | 'year';
+export type MapOverlayMode = 'all' | 'visited' | 'wishlist' | 'favorites' | 'skipped' | 'year';
 
 export interface UserProfile {
   id: string;

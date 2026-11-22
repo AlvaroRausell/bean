@@ -64,7 +64,7 @@ export function parseAndValidateBackup(rawJson: string): BackupPreview {
   }
 
   // Validate individual place entries
-  const validStatuses = new Set(['none', 'visited', 'wishlist', 'lived']);
+  const validStatuses = new Set(['none', 'visited', 'wishlist', 'lived', 'skipped']);
   const userPlaces: UserPlace[] = data.userPlaces.map((p: any) => {
     if (!p || typeof p.placeId !== 'string' || !validStatuses.has(p.status)) {
       throw new Error('Backup contains an invalid place entry.');
@@ -137,7 +137,7 @@ export function parseAndValidateBackup(rawJson: string): BackupPreview {
       rawProfile.mapTheme === 'parchment' || rawProfile.mapTheme === 'ocean'
         ? rawProfile.mapTheme
         : 'midnight',
-    defaultProjection: rawProfile.defaultProjection === '3d' ? '3d' : '2d',
+    defaultProjection: '2d',
   };
 
   const backup: BeanBackupV1 = {

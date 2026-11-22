@@ -37,7 +37,6 @@ export function PlaceSearchModal({
   onPickPlace,
 }: Props) {
   const [query, setQuery] = useState('');
-  const includeTerritories = useTravelStore((s) => s.userProfile.includeTerritories);
   const themeId = useTravelStore((s) => s.userProfile.mapTheme);
   const userPlaces = useTravelStore((s) => s.userPlaces);
   const recentSearchIds = useTravelStore((s) => s.recentSearchIds);
@@ -49,10 +48,8 @@ export function PlaceSearchModal({
   const theme = MAP_THEMES[themeId];
   const trimmed = query.trim();
 
-  const results = useMemo(
-    () => searchPlaces(query, mode === 'pick_home' ? true : includeTerritories),
-    [query, includeTerritories, mode]
-  );
+  // Always search all 243 places (countries + territories like Greenland & New Caledonia)
+  const results = useMemo(() => searchPlaces(query, true), [query]);
 
   const recentPlaces = useMemo(
     () =>
@@ -360,7 +357,12 @@ export function PlaceSearchModal({
                         )}
                       </View>
                       <Text style={[styles.meta, { color: theme.textSecondary }]}>
-                        {item.parentId === 'GB' ? 'United Kingdom' : item.continent}
+                        {item.parentId === 'GB'
+                          ? 'United Kingdom'
+                          : item.kind === 'territory'
+                          ? `Territory · ${item.continent}`
+                          : item.continent}
+                        {status === 'skipped' ? ' · Not for me' : ''}
                       </Text>
                     </View>
 
