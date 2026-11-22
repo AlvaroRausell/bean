@@ -1,5 +1,5 @@
 import * as d3Geo from 'd3-geo';
-import { feature } from 'topojson-client';
+import { feature, mesh } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Skia, SkPath } from '@shopify/react-native-skia';
@@ -25,6 +25,7 @@ export interface GeoEngine2D {
   pathGenerator: d3Geo.GeoPath;
   places: CompiledPlace2D[];
   placeById: Record<string, CompiledPlace2D>;
+  borderMeshPath: SkPath;
   graticulePath: SkPath;
   spherePath: SkPath;
 }
@@ -98,6 +99,12 @@ export function getGeoEngine2D(): GeoEngine2D {
     placeById[id] = compiled;
   }
 
+  const topo = worldTopoRaw as unknown as Topology<{
+    places: GeometryCollection<{ id: string }>;
+  }>;
+  const borderMeshSvg = pathGenerator(mesh(topo, topo.objects.places)) ?? '';
+  const borderMeshPath = Skia.Path.MakeFromSVGString(borderMeshSvg) ?? Skia.Path.Make();
+
   const graticuleSvg = pathGenerator(d3Geo.geoGraticule10()) ?? '';
   const graticulePath = Skia.Path.MakeFromSVGString(graticuleSvg) ?? Skia.Path.Make();
 
@@ -109,6 +116,7 @@ export function getGeoEngine2D(): GeoEngine2D {
     pathGenerator,
     places,
     placeById,
+    borderMeshPath,
     graticulePath,
     spherePath,
   };

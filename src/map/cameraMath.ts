@@ -64,26 +64,6 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 /**
- * Computes new camera state after zooming from `prev` to `nextScale`
- * while keeping screen focal point `(focalX, focalY)` pinned to the exact same map coordinate.
- */
-export function zoomAroundFocalPoint(
-  prev: CameraState,
-  nextScaleRaw: number,
-  focalX: number,
-  focalY: number,
-  minZoom = 0.45,
-  maxZoom = 24.0
-): CameraState {
-  'worklet';
-  const scale = clamp(nextScaleRaw, minZoom, maxZoom);
-  const ratio = scale / prev.scale;
-  const tx = focalX - (focalX - prev.tx) * ratio;
-  const ty = focalY - (focalY - prev.ty) * ratio;
-  return { scale, tx, ty };
-}
-
-/**
  * Clamps translation so the user can effortlessly pan every corner of the map
  * into the center of a portrait viewport without losing the map off-screen.
  */
@@ -101,16 +81,86 @@ export function clampCameraToBounds(
   const marginX = viewport.width * 0.45;
   const marginY = viewport.height * 0.42;
 
-  const minTx = viewport.width - scaledW - marginX;
-  const maxTx = marginX;
+  const minTxRaw = viewport.width - scaledW - marginX;
+  const maxTxRaw = marginX;
+  const minTx = Math.min(minTxRaw, maxTxRaw);
+  const maxTx = Math.max(minTxRaw, maxTxRaw);
 
-  const minTy = viewport.height - scaledH - marginY;
-  const maxTy = marginY;
+  const minTyRaw = viewport.height - scaledH - marginY;
+  const maxTyRaw = marginY;
+  const minTy = Math.min(minTyRaw, maxTyRaw);
+  const maxTy = Math.max(minTyRaw, maxTyRaw);
 
   return {
     scale: camera.scale,
-    tx: clamp(camera.tx, Math.min(minTx, maxTx), Math.max(minTx, maxTx)),
-    ty: clamp(camera.ty, Math.min(minTy, maxTy), Math.max(minTy, maxTy)),
+    tx: Math.min(maxTx, Math.max(minTx, camera.tx)),
+    ty: Math.min(maxTy, Math.max(minTy, camera.ty)),
+  };
+}
+
+/**
+ * Computes new camera state after zooming from `prev` to `nextScale`
+ * while keeping screen focal point `(focalX, focalY)` pinned to the exact same map coordinate.
+ */
+export function zoomAroundFocalPoint(
+  prev: CameraState,
+  nextScaleRaw: number,
+  focalX: number,
+  focalY: number,
+  minZoom = 0.45,
+  maxZoom = 24.0
+): CameraState {
+  'worklet';
+  const scale = Math.min(maxZoom, Math.max(minZoom, nextScaleRaw));
+  const ratio = scale / prev.scale;
+  const tx = focalX - (focalX - prev.tx) * ratio;
+  const ty = focalY - (focalY - prev.ty) * ratio;
+  return { scale, tx, ty };
+}
+
+/**
+ * Incremental, jump-free multi-touch camera step.
+ * Maps the world point under the previous centroid `(cPx, cPy)` directly onto the new
+ * centroid `(cx, cy)` while scaling by `scaleRatio` (clamped to `[minZoom, maxZoom]`).
+ * Guarantees 0.00 pt slip across 1->2 and 2->1 pointer transitions and zero dead-zone at limits.
+ * Self-contained (no nested worklet calls) for guaranteed Reanimated 4 UI-thread safety.
+ */
+export function stepCameraMultiTouch(
+  prev: CameraState,
+  cPx: number,
+  cPy: number,
+  cx: number,
+  cy: number,
+  scaleRatio: number,
+  viewport: ViewportSize,
+  minZoom = 0.45,
+  maxZoom = 24.0
+): CameraState {
+  'worklet';
+  const nextScale = Math.min(maxZoom, Math.max(minZoom, prev.scale * scaleRatio));
+  const appliedRatio = nextScale / prev.scale;
+  const rawTx = cx - (cPx - prev.tx) * appliedRatio;
+  const rawTy = cy - (cPy - prev.ty) * appliedRatio;
+
+  const scaledW = 1000 * nextScale;
+  const scaledH = 520 * nextScale;
+  const marginX = viewport.width * 0.45;
+  const marginY = viewport.height * 0.42;
+
+  const minTxRaw = viewport.width - scaledW - marginX;
+  const maxTxRaw = marginX;
+  const minTx = Math.min(minTxRaw, maxTxRaw);
+  const maxTx = Math.max(minTxRaw, maxTxRaw);
+
+  const minTyRaw = viewport.height - scaledH - marginY;
+  const maxTyRaw = marginY;
+  const minTy = Math.min(minTyRaw, maxTyRaw);
+  const maxTy = Math.max(minTyRaw, maxTyRaw);
+
+  return {
+    scale: nextScale,
+    tx: Math.min(maxTx, Math.max(minTx, rawTx)),
+    ty: Math.min(maxTy, Math.max(minTy, rawTy)),
   };
 }
 
@@ -168,7 +218,8 @@ export function screenToMapPoint(
  */
 export function computeAdaptiveStrokeWidth(scale: number, baseWidth = 0.9): number {
   'worklet';
-  return clamp(baseWidth / Math.pow(Math.max(1, scale), 0.72), 0.14, 1.2);
+  const raw = baseWidth / Math.pow(Math.max(1, scale), 0.72);
+  return Math.min(1.2, Math.max(0.14, raw));
 }
 
 /**

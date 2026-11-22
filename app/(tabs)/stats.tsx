@@ -25,7 +25,9 @@ import {
 import * as Haptics from 'expo-haptics';
 import {
   Check,
+  ChevronRight,
   Info,
+  Minus,
   Plus,
   Search,
   Settings,
@@ -36,6 +38,7 @@ import {
 import { PLACES_CATALOG, searchPlaces } from '@/data/places';
 import {
   calculateAgePercentile,
+  calculateCountriesForPercentile,
   computeWorldStats,
 } from '@/domain/statsCalculator';
 import { REGION_PRESETS } from '@/map/cameraMath';
@@ -70,6 +73,21 @@ function formatLat(lat: number): string {
   return `${abs}°${lat >= 0 ? 'N' : 'S'}`;
 }
 
+function ordinal(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
+
 function formatAgeCopy(percentile: number, age: number): string {
   const inTen = Math.round(percentile / 10);
   if (percentile >= 95) {
@@ -89,6 +107,7 @@ export default function RecordScreen() {
   const userPlaces = useTravelStore((s) => s.userPlaces);
   const yearCollections = useTravelStore((s) => s.yearCollections);
   const collectionItems = useTravelStore((s) => s.collectionItems);
+  const travelGoals = useTravelStore((s) => s.travelGoals);
   const userProfile = useTravelStore((s) => s.userProfile);
   const selectPlace = useTravelStore((s) => s.selectPlace);
   const requestCameraBbox = useTravelStore((s) => s.requestCameraBbox);
@@ -96,6 +115,7 @@ export default function RecordScreen() {
   const createYearCollection = useTravelStore((s) => s.createYearCollection);
   const deleteYearCollection = useTravelStore((s) => s.deleteYearCollection);
   const togglePlaceInCollection = useTravelStore((s) => s.togglePlaceInCollection);
+  const createGoal = useTravelStore((s) => s.createGoal);
 
   const theme = MAP_THEMES[userProfile.mapTheme];
   const hatchEffect = useMemo(() => getHatchRuntimeEffect(), []);
@@ -107,6 +127,7 @@ export default function RecordScreen() {
   const posterSmallFont = useFont(FONT_BODY_TTF, 24);
 
   const [showAgeNote, setShowAgeNote] = useState(false);
+  const [targetPercentile, setTargetPercentile] = useState(95);
   const [sharing, setSharing] = useState(false);
 
   // Add / Edit Year Collection modals (migrated into Record's unified Years timeline)
@@ -139,6 +160,38 @@ export default function RecordScreen() {
     if (age < 10 || age > 105) return null;
     return calculateAgePercentile(age, stats.visitedCount);
   }, [userProfile.birthYear, currentYear, stats.visitedCount]);
+
+  const percentileTarget = useMemo(() => {
+    if (!agePercentile) return null;
+    return calculateCountriesForPercentile(
+      agePercentile.age,
+      targetPercentile,
+      stats.totalCount
+    );
+  }, [agePercentile, targetPercentile, stats.totalCount]);
+
+  const matchingPercentileGoal = useMemo(() => {
+    if (!percentileTarget) return null;
+    return (
+      travelGoals.find(
+        (g) =>
+          !g.deletedAt &&
+          g.scope === 'world' &&
+          g.targetCount === percentileTarget.requiredCountries
+      ) ?? null
+    );
+  }, [travelGoals, percentileTarget]);
+
+  const handleSetPercentileGoal = async () => {
+    if (!percentileTarget) return;
+    Haptics.selectionAsync();
+    await createGoal({
+      title: `${ordinal(percentileTarget.targetPercentile)} percentile (${percentileTarget.requiredCountries} countries)`,
+      targetCount: percentileTarget.requiredCountries,
+      targetYear: currentYear + 1,
+      scope: 'world',
+    });
+  };
 
   // Hero uncropped world mini-map geometry
   const contentWidth = Math.max(280, screenWidth - 36);
@@ -826,9 +879,9 @@ export default function RecordScreen() {
           </View>
         )}
 
-        {/* Quiet Inline Age Distribution Context (no gamified amber bar or duplicate input!) */}
+        {/* Quiet Inline Age Distribution Context + Percentile Target Planner */}
         <View style={[styles.section, { borderTopColor: theme.cardBorder }]}>
-          {agePercentile ? (
+          {agePercentile && percentileTarget ? (
             <View style={styles.ageBlock}>
               <View style={styles.ageInline}>
                 <Canvas style={{ width: 64, height: 20 }}>
@@ -839,6 +892,16 @@ export default function RecordScreen() {
                     strokeWidth={1.4}
                     opacity={0.6}
                   />
+                  {targetPercentile > agePercentile.percentile && (
+                    <Circle
+                      cx={Math.max(4, Math.min(60, 4 + (targetPercentile / 100) * 56))}
+                      cy={14.5 - Math.exp(-Math.pow((targetPercentile - 42) / 28, 2)) * 10}
+                      r={3}
+                      color={theme.accent}
+                      style="stroke"
+                      strokeWidth={1.4}
+                    />
+                  )}
                   <Circle
                     cx={Math.max(4, Math.min(60, 4 + (agePercentile.percentile / 100) * 56))}
                     cy={14.5 - Math.exp(-Math.pow((agePercentile.percentile - 42) / 28, 2)) * 10}
@@ -865,9 +928,197 @@ export default function RecordScreen() {
               </View>
               {showAgeNote && (
                 <Text style={[styles.ageFootnote, { color: theme.textMuted }]}>
-                  An estimate from published travel surveys. It stays on this phone.
+                  Rough offline log-normal estimate calibrated to a UK/European adult baseline (median ~6 at 28, ~10 at 45), not a live survey. Exact percentiles vary widely by home region — US (Pew) and global medians are significantly lower.
                 </Text>
               )}
+
+              {/* Target Percentile Calculator & 1-Tap Goal */}
+              <View style={[styles.pctTargetBox, { borderTopColor: theme.cardBorder }]}>
+                <View style={styles.pctControlRow}>
+                  <View style={styles.pctPresetRow}>
+                    {[75, 90, 95, 99].map((pct) => {
+                      const active = targetPercentile === pct;
+                      return (
+                        <Pressable
+                          key={pct}
+                          onPress={() => {
+                            Haptics.selectionAsync();
+                            setTargetPercentile(pct);
+                          }}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: active }}
+                          accessibilityLabel={`Target ${ordinal(pct)} percentile`}
+                          style={({ pressed }) => [
+                            styles.pctChip,
+                            {
+                              backgroundColor: active
+                                ? theme.accentSoft
+                                : theme.surfaceElevated,
+                              borderColor: active ? theme.accent : theme.cardBorder,
+                              opacity: pressed ? 0.72 : 1,
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.pctChipText,
+                              { color: active ? theme.accent : theme.textSecondary },
+                            ]}
+                          >
+                            {ordinal(pct)}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+
+                  <View
+                    style={[
+                      styles.pctStepper,
+                      {
+                        backgroundColor: theme.surfaceSubtle,
+                        borderColor: theme.cardBorder,
+                      },
+                    ]}
+                  >
+                    <Pressable
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setTargetPercentile((v) => Math.max(50, v - 1));
+                      }}
+                      hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel="Decrease target percentile"
+                      style={styles.pctStepBtn}
+                    >
+                      <Minus
+                        size={13}
+                        color={theme.textSecondary}
+                        strokeWidth={2}
+                        absoluteStrokeWidth
+                      />
+                    </Pressable>
+                    <Text style={[styles.pctStepVal, { color: theme.textPrimary }]}>
+                      {targetPercentile}%
+                    </Text>
+                    <Pressable
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setTargetPercentile((v) => Math.min(99, v + 1));
+                      }}
+                      hitSlop={6}
+                      accessibilityRole="button"
+                      accessibilityLabel="Increase target percentile"
+                      style={styles.pctStepBtn}
+                    >
+                      <Plus
+                        size={13}
+                        color={theme.textSecondary}
+                        strokeWidth={2}
+                        absoluteStrokeWidth
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+
+                {(() => {
+                  const needed = percentileTarget.requiredCountries;
+                  const moreToGo = Math.max(0, needed - stats.visitedCount);
+                  return (
+                    <>
+                      <Text style={[styles.pctSummary, { color: theme.textSecondary }]}>
+                        {moreToGo > 0 ? (
+                          <>
+                            Reach the{' '}
+                            <Text style={[styles.inlineNum, { color: theme.textPrimary }]}>
+                              {ordinal(percentileTarget.targetPercentile)}
+                            </Text>{' '}
+                            percentile (top {percentileTarget.topPercent}%) for age{' '}
+                            <Text style={styles.inlineNum}>{percentileTarget.age}</Text> at{' '}
+                            <Text style={[styles.inlineNum, { color: theme.textPrimary }]}>
+                              {needed}
+                            </Text>{' '}
+                            countries —{' '}
+                            <Text style={[styles.inlineNum, { color: theme.accent }]}>
+                              {moreToGo} more
+                            </Text>{' '}
+                            to go.
+                          </>
+                        ) : (
+                          <>
+                            Already at the{' '}
+                            <Text style={[styles.inlineNum, { color: theme.textPrimary }]}>
+                              {ordinal(percentileTarget.targetPercentile)}
+                            </Text>{' '}
+                            percentile for age{' '}
+                            <Text style={styles.inlineNum}>{percentileTarget.age}</Text> (
+                            <Text style={styles.inlineNum}>{needed}</Text> countries needed).
+                          </>
+                        )}
+                      </Text>
+
+                      {moreToGo > 0 && (
+                        <View style={styles.pctGoalActionRow}>
+                          {matchingPercentileGoal ? (
+                            <Pressable
+                              onPress={() => {
+                                Haptics.selectionAsync();
+                                router.navigate('/(tabs)/goals');
+                              }}
+                              accessibilityRole="button"
+                              accessibilityLabel="View percentile goal in Plans"
+                              style={({ pressed }) => [
+                                styles.pctGoalLink,
+                                { opacity: pressed ? 0.65 : 1 },
+                              ]}
+                            >
+                              <Check
+                                size={14}
+                                color={theme.accent}
+                                strokeWidth={2.2}
+                                absoluteStrokeWidth
+                              />
+                              <Text style={[styles.pctGoalLinkText, { color: theme.accent }]}>
+                                Goal in Plans
+                              </Text>
+                              <ChevronRight
+                                size={14}
+                                color={theme.accent}
+                                strokeWidth={2}
+                                absoluteStrokeWidth
+                              />
+                            </Pressable>
+                          ) : (
+                            <Pressable
+                              onPress={handleSetPercentileGoal}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Set ${needed} countries as a travel goal`}
+                              style={({ pressed }) => [
+                                styles.pctGoalBtn,
+                                {
+                                  backgroundColor: theme.surfaceElevated,
+                                  borderColor: theme.cardBorder,
+                                  opacity: pressed ? 0.72 : 1,
+                                },
+                              ]}
+                            >
+                              <Plus
+                                size={14}
+                                color={theme.accent}
+                                strokeWidth={2.1}
+                                absoluteStrokeWidth
+                              />
+                              <Text style={[styles.pctGoalBtnText, { color: theme.accent }]}>
+                                Set {needed} countries as a goal
+                              </Text>
+                            </Pressable>
+                          )}
+                        </View>
+                      )}
+                    </>
+                  );
+                })()}
+              </View>
             </View>
           ) : (
             <Pressable
@@ -1432,6 +1683,89 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.body,
     fontSize: 13.5,
     lineHeight: 19,
+  },
+  pctTargetBox: {
+    marginTop: 6,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: 10,
+  },
+  pctControlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  pctPresetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pctChip: {
+    height: 32,
+    paddingHorizontal: 10,
+    borderRadius: 9,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pctChipText: {
+    fontFamily: FONTS.numMedium,
+    fontSize: 12.5,
+    fontVariant: ['tabular-nums'],
+  },
+  pctStepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 32,
+    borderRadius: 9,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 2,
+  },
+  pctStepBtn: {
+    width: 28,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pctStepVal: {
+    minWidth: 34,
+    textAlign: 'center',
+    fontFamily: FONTS.num,
+    fontSize: 13,
+    fontVariant: ['tabular-nums'],
+  },
+  pctSummary: {
+    fontFamily: FONTS.body,
+    fontSize: 13.5,
+    lineHeight: 19.5,
+  },
+  pctGoalActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pctGoalBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    height: 38,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  pctGoalBtnText: {
+    fontFamily: FONTS.bodyMedium,
+    fontSize: 13.5,
+  },
+  pctGoalLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    height: 36,
+  },
+  pctGoalLinkText: {
+    fontFamily: FONTS.bodyMedium,
+    fontSize: 13.5,
   },
   modalBackdrop: {
     flex: 1,

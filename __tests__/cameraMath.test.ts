@@ -8,6 +8,7 @@ import {
   MAX_ZOOM_2D,
   MIN_ZOOM_2D,
   screenToMapPoint,
+  stepCameraMultiTouch,
   zoomAroundFocalPoint,
 } from '@/map/cameraMath';
 
@@ -84,5 +85,30 @@ describe('Portrait Camera & Navigation Math', () => {
     expect(BASE_MAP_HEIGHT * cam.scale).toBeLessThanOrEqual(landscape.height);
     expect(cam.tx).toBeGreaterThanOrEqual(0);
     expect(cam.ty).toBeGreaterThanOrEqual(0);
+  });
+
+  it('produces zero focal slip across 2->1->2 finger transitions and reverses immediately at max zoom', () => {
+    let cam = { scale: 2.5, tx: -900, ty: -220 };
+
+    // Two fingers at (100, 300) and (300, 500) -> centroid (200, 400), span 282.84
+    const worldBeforePinch = screenToMapPoint(200, 400, cam);
+    // Spread fingers by 1.5x and pan centroid by (+20, -15)
+    cam = stepCameraMultiTouch(cam, 200, 400, 220, 385, 1.5, portraitViewport);
+    const worldAfterPinch = screenToMapPoint(220, 385, cam);
+    expect(worldAfterPinch.x).toBeCloseTo(worldBeforePinch.x, 5);
+    expect(worldAfterPinch.y).toBeCloseTo(worldBeforePinch.y, 5);
+
+    // Finger 2 lifts -> remaining finger is at (100, 300) and moves 0px -> MUST produce 0.00 pt slip!
+    const beforeLift = { ...cam };
+    cam = stepCameraMultiTouch(cam, 100, 300, 100, 300, 1, portraitViewport);
+    expect(cam.tx).toBeCloseTo(beforeLift.tx, 6);
+    expect(cam.ty).toBeCloseTo(beforeLift.ty, 6);
+    expect(cam.scale).toBeCloseTo(beforeLift.scale, 6);
+
+    // Over-pinch past MAX_ZOOM_2D then immediately reverse -> must unstick on the very first frame
+    cam = stepCameraMultiTouch(cam, 200, 400, 200, 400, 20, portraitViewport);
+    expect(cam.scale).toBe(MAX_ZOOM_2D);
+    cam = stepCameraMultiTouch(cam, 200, 400, 200, 400, 0.9, portraitViewport);
+    expect(cam.scale).toBeCloseTo(MAX_ZOOM_2D * 0.9, 5);
   });
 });

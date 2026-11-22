@@ -18,6 +18,7 @@ import {
   Rect,
   Shader,
   Skia,
+  SkPath,
   Text as SkiaText,
   useFont,
   vec,
@@ -47,6 +48,7 @@ import {
   computePortraitInitialCamera,
   fitProjectedBoundsToViewport,
   screenToMapPoint,
+  stepCameraMultiTouch,
   zoomAroundFocalPoint,
 } from '@/map/cameraMath';
 import {
@@ -182,6 +184,16 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   const hatchEffect = useMemo(() => getHatchRuntimeEffect(), []);
   const labelFont = useFont(LABEL_FONT_ASSET, 10.5);
 
+  // Cache label widths once per font instance (avoids 243 measureText calls on every settle)
+  const labelWidthCache = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!labelFont) return map;
+    for (const item of engine2D.places) {
+      map.set(item.id, labelFont.measureText(item.place.name).width);
+    }
+    return map;
+  }, [labelFont, engine2D.places]);
+
   const [reduceMotion, setReduceMotion] = useState(false);
   useEffect(() => {
     let mounted = true;
@@ -235,7 +247,6 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   // ---------- 2D Camera State (UI thread Reanimated SharedValues) ----------
   const initialCam = useMemo(() => {
     const base = computePortraitInitialCamera({ width, height });
-    // In landscape, always frame the full world cleanly edge-to-edge
     if (width > height) {
       return base;
     }
@@ -261,15 +272,24 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   const tx = useSharedValue(initialCam.tx);
   const ty = useSharedValue(initialCam.ty);
 
-  // Gesture scratch shared values (conflict-free pan & pinch)
-  const isPinching = useSharedValue(false);
-  const panLastTransX = useSharedValue(0);
-  const panLastTransY = useSharedValue(0);
-  const pinchStartScale = useSharedValue(1);
-  const pinchStartTx = useSharedValue(0);
-  const pinchStartTy = useSharedValue(0);
-  const pinchStartFocalX = useSharedValue(0);
-  const pinchStartFocalY = useSharedValue(0);
+  // Unified pointer-slot state machine (zero-slip 1-finger pan + 2-finger pinch/pan)
+  const aId = useSharedValue(-1);
+  const aX = useSharedValue(0);
+  const aY = useSharedValue(0);
+  const bId = useSharedValue(-1);
+  const bX = useSharedValue(0);
+  const bY = useSharedValue(0);
+  const travel = useSharedValue(0);
+  const dragging = useSharedValue(false);
+  const multiTouchSeq = useSharedValue(false);
+  const downAt = useSharedValue(0);
+  const lastCx = useSharedValue(0);
+  const lastCy = useSharedValue(0);
+  const vx = useSharedValue(0);
+  const vy = useSharedValue(0);
+  const lastT = useSharedValue(0);
+  const touchSeqId = useSharedValue(0);
+  const decayDoneCount = useSharedValue(0);
 
   const [settledCam, setSettledCam] = useState<CameraState>(initialCam);
   const hasUserMoved2DRef = useRef(false);
@@ -490,44 +510,182 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     [selectPlace, selectedPlaceId]
   );
 
-  // ---------- Conflict-Free 2D Gesture Suite ----------
-  const pan2D = useMemo(
+  // ---------- Unified Jump-Free Manual Camera State Machine (0.00 pt 2->1->2 slip!) ----------
+  const camera2D = useMemo(
     () =>
-      Gesture.Pan()
-        .minPointers(1)
-        .maxPointers(1)
-        .minDistance(8)
-        .onStart((e) => {
-          if (isPinching.value) return;
-          cancelAnimation(tx);
-          cancelAnimation(ty);
-          cancelAnimation(scale);
-          panLastTransX.value = e.translationX;
-          panLastTransY.value = e.translationY;
-        })
-        .onUpdate((e) => {
-          if (isPinching.value) return;
-          const dx = e.translationX - panLastTransX.value;
-          const dy = e.translationY - panLastTransY.value;
-          panLastTransX.value = e.translationX;
-          panLastTransY.value = e.translationY;
+      Gesture.Manual()
+        .onTouchesDown((e, sm) => {
+          const now = Date.now();
+          if (aId.value < 0 && bId.value < 0) {
+            // First finger down: immediately stop any active fling or camera animation
+            cancelAnimation(tx);
+            cancelAnimation(ty);
+            cancelAnimation(scale);
+            touchSeqId.value += 1;
+            travel.value = 0;
+            dragging.value = false;
+            multiTouchSeq.value = false;
+            vx.value = 0;
+            vy.value = 0;
+            downAt.value = now;
+            lastT.value = now;
+            sm.begin();
+          }
 
-          const clamped = clampCameraToBounds(
-            {
-              scale: scale.value,
-              tx: tx.value + dx,
-              ty: ty.value + dy,
-            },
-            { width, height }
-          );
-          tx.value = clamped.tx;
-          ty.value = clamped.ty;
+          for (const t of e.changedTouches) {
+            if (aId.value < 0) {
+              aId.value = t.id;
+              aX.value = t.x;
+              aY.value = t.y;
+            } else if (bId.value < 0) {
+              bId.value = t.id;
+              bX.value = t.x;
+              bY.value = t.y;
+              multiTouchSeq.value = true;
+              vx.value = 0;
+              vy.value = 0;
+              lastT.value = now;
+            }
+          }
+
+          const hasA = aId.value >= 0;
+          const hasB = bId.value >= 0;
+          if (hasA && hasB) {
+            lastCx.value = (aX.value + bX.value) / 2;
+            lastCy.value = (aY.value + bY.value) / 2;
+          } else if (hasA) {
+            lastCx.value = aX.value;
+            lastCy.value = aY.value;
+          } else if (hasB) {
+            lastCx.value = bX.value;
+            lastCy.value = bY.value;
+          }
         })
-        .onEnd((e) => {
-          if (isPinching.value) return;
-          const speed = Math.hypot(e.velocityX, e.velocityY);
-          if (reduceMotion || speed < 65) {
+        .onTouchesMove((e, sm) => {
+          let nax = aX.value;
+          let nay = aY.value;
+          let nbx = bX.value;
+          let nby = bY.value;
+          for (const t of e.allTouches) {
+            if (t.id === aId.value) {
+              nax = t.x;
+              nay = t.y;
+            } else if (t.id === bId.value) {
+              nbx = t.x;
+              nby = t.y;
+            }
+          }
+
+          const hasA = aId.value >= 0;
+          const hasB = bId.value >= 0;
+          const two = hasA && hasB;
+          if (!hasA && !hasB) return;
+
+          const cPx = two ? (aX.value + bX.value) / 2 : hasA ? aX.value : bX.value;
+          const cPy = two ? (aY.value + bY.value) / 2 : hasA ? aY.value : bY.value;
+          const cx = two ? (nax + nbx) / 2 : hasA ? nax : nbx;
+          const cy = two ? (nay + nby) / 2 : hasA ? nay : nby;
+          const dP = two ? Math.hypot(aX.value - bX.value, aY.value - bY.value) : 0;
+          const d = two ? Math.hypot(nax - nbx, nay - nby) : 0;
+
+          lastCx.value = cx;
+          lastCy.value = cy;
+
+          if (!dragging.value) {
+            travel.value += Math.hypot(cx - cPx, cy - cPy) + Math.abs(d - dP);
+            if (travel.value >= 8) {
+              dragging.value = true;
+              sm.activate();
+              lastT.value = Date.now();
+            }
+          }
+
+          if (dragging.value) {
+            const scaleRatio = two && dP >= 24 && d >= 24 ? d / dP : 1;
+            const nextCam = stepCameraMultiTouch(
+              { scale: scale.value, tx: tx.value, ty: ty.value },
+              cPx,
+              cPy,
+              cx,
+              cy,
+              scaleRatio,
+              { width, height },
+              minZoom,
+              24.0
+            );
+            scale.value = nextCam.scale;
+            tx.value = nextCam.tx;
+            ty.value = nextCam.ty;
+
+            const now = Date.now();
+            const dt = now - lastT.value;
+            if (!two && dt > 0 && dt < 120) {
+              const alpha = 1 - Math.exp(-dt / 40);
+              vx.value += alpha * (((cx - cPx) / dt) * 1000 - vx.value);
+              vy.value += alpha * (((cy - cPy) / dt) * 1000 - vy.value);
+              lastT.value = now;
+            } else if (two) {
+              vx.value = 0;
+              vy.value = 0;
+              lastT.value = now;
+            }
+          }
+
+          aX.value = nax;
+          aY.value = nay;
+          bX.value = nbx;
+          bY.value = nby;
+        })
+        .onTouchesUp((e, sm) => {
+          const now = Date.now();
+          // Always remove lifted pointers from changedTouches (iOS keeps them in allTouches on up)
+          for (const t of e.changedTouches) {
+            if (t.id === aId.value) aId.value = -1;
+            else if (t.id === bId.value) bId.value = -1;
+          }
+
+          // If one finger still remains down, reset velocity and seamlessly continue panning (0.00 pt jump)
+          if (aId.value >= 0 || bId.value >= 0) {
+            vx.value = 0;
+            vy.value = 0;
+            lastT.value = now;
+            return;
+          }
+
+          const mySeq = touchSeqId.value;
+
+          if (!dragging.value) {
+            // Quick two-finger tap zooms out smoothly by 0.5x
+            if (multiTouchSeq.value && now - downAt.value < 260) {
+              const target = clampCameraToBounds(
+                zoomAroundFocalPoint(
+                  { scale: scale.value, tx: tx.value, ty: ty.value },
+                  scale.value * 0.5,
+                  lastCx.value,
+                  lastCy.value,
+                  minZoom,
+                  24.0
+                ),
+                { width, height }
+              );
+              const d = reduceMotion ? 0 : 220;
+              scale.value = withTiming(target.scale, { duration: d });
+              tx.value = withTiming(target.tx, { duration: d });
+              ty.value = withTiming(target.ty, { duration: d }, (finished) => {
+                if (finished && touchSeqId.value === mySeq) {
+                  runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
+                }
+              });
+            }
+            sm.fail();
+            return;
+          }
+
+          const stale = now - lastT.value > 80;
+          const speed = Math.hypot(vx.value, vy.value);
+          if (reduceMotion || stale || speed < 120) {
             runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+            sm.end();
             return;
           }
 
@@ -540,88 +698,43 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           const minTy = Math.min(height - scaledH - marginY, marginY);
           const maxTy = Math.max(height - scaledH - marginY, marginY);
 
-          const xDominant = Math.abs(e.velocityX) >= Math.abs(e.velocityY);
+          decayDoneCount.value = 0;
+          const onAxisDone = (finished?: boolean) => {
+            'worklet';
+            if (!finished || touchSeqId.value !== mySeq) return;
+            decayDoneCount.value += 1;
+            if (decayDoneCount.value === 2) {
+              runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+            }
+          };
 
           tx.value = withDecay(
             {
-              velocity: e.velocityX * 0.82,
+              velocity: vx.value * 0.85,
               deceleration: 0.993,
               clamp: [minTx, maxTx],
             },
-            xDominant
-              ? (finished) => {
-                  if (finished) {
-                    runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
-                  }
-                }
-              : undefined
+            onAxisDone
           );
           ty.value = withDecay(
             {
-              velocity: e.velocityY * 0.82,
+              velocity: vy.value * 0.85,
               deceleration: 0.993,
               clamp: [minTy, maxTy],
             },
-            !xDominant
-              ? (finished) => {
-                  if (finished) {
-                    runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
-                  }
-                }
-              : undefined
+            onAxisDone
           );
-        }),
-    [
-      width,
-      height,
-      tx,
-      ty,
-      scale,
-      isPinching,
-      panLastTransX,
-      panLastTransY,
-      reduceMotion,
-      syncSettledCamera,
-    ]
-  );
-
-  const pinch2D = useMemo(
-    () =>
-      Gesture.Pinch()
-        .onStart((e) => {
-          isPinching.value = true;
-          cancelAnimation(scale);
-          cancelAnimation(tx);
-          cancelAnimation(ty);
-          pinchStartScale.value = scale.value;
-          pinchStartTx.value = tx.value;
-          pinchStartTy.value = ty.value;
-          pinchStartFocalX.value = e.focalX;
-          pinchStartFocalY.value = e.focalY;
+          sm.end();
         })
-        .onUpdate((e) => {
-          const panDeltaX = e.focalX - pinchStartFocalX.value;
-          const panDeltaY = e.focalY - pinchStartFocalY.value;
-          const zoomed = zoomAroundFocalPoint(
-            {
-              scale: pinchStartScale.value,
-              tx: pinchStartTx.value + panDeltaX,
-              ty: pinchStartTy.value + panDeltaY,
-            },
-            pinchStartScale.value * e.scale,
-            e.focalX,
-            e.focalY,
-            minZoom,
-            24.0
-          );
-          const clamped = clampCameraToBounds(zoomed, { width, height });
-          scale.value = clamped.scale;
-          tx.value = clamped.tx;
-          ty.value = clamped.ty;
-        })
-        .onFinalize(() => {
-          isPinching.value = false;
-          runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+        .onTouchesCancelled((_e, sm) => {
+          aId.value = -1;
+          bId.value = -1;
+          vx.value = 0;
+          vy.value = 0;
+          sm.fail();
+          if (dragging.value) {
+            runOnJS(syncSettledCamera)(scale.value, tx.value, ty.value);
+          }
         }),
     [
       width,
@@ -630,12 +743,24 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
       scale,
       tx,
       ty,
-      isPinching,
-      pinchStartScale,
-      pinchStartTx,
-      pinchStartTy,
-      pinchStartFocalX,
-      pinchStartFocalY,
+      aId,
+      aX,
+      aY,
+      bId,
+      bX,
+      bY,
+      travel,
+      dragging,
+      multiTouchSeq,
+      downAt,
+      lastCx,
+      lastCy,
+      vx,
+      vy,
+      lastT,
+      touchSeqId,
+      decayDoneCount,
+      reduceMotion,
       syncSettledCamera,
     ]
   );
@@ -647,10 +772,11 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         .maxDelay(190)
         .maxDistance(24)
         .onEnd((e, success) => {
-          if (!success) return;
+          if (!success || multiTouchSeq.value || dragging.value) return;
           cancelAnimation(scale);
           cancelAnimation(tx);
           cancelAnimation(ty);
+          const mySeq = touchSeqId.value;
           const target = clampCameraToBounds(
             zoomAroundFocalPoint(
               { scale: scale.value, tx: tx.value, ty: ty.value },
@@ -666,12 +792,24 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           scale.value = withTiming(target.scale, { duration: d });
           tx.value = withTiming(target.tx, { duration: d });
           ty.value = withTiming(target.ty, { duration: d }, (finished) => {
-            if (finished) {
+            if (finished && touchSeqId.value === mySeq) {
               runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
             }
           });
         }),
-    [width, height, minZoom, scale, tx, ty, reduceMotion, syncSettledCamera]
+    [
+      width,
+      height,
+      minZoom,
+      scale,
+      tx,
+      ty,
+      multiTouchSeq,
+      dragging,
+      touchSeqId,
+      reduceMotion,
+      syncSettledCamera,
+    ]
   );
 
   const singleTap2D = useMemo(
@@ -681,9 +819,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
         .maxDistance(20)
         .maxDuration(340)
         .onEnd((e, success) => {
-          if (!success) return;
-          cancelAnimation(tx);
-          cancelAnimation(ty);
+          if (!success || multiTouchSeq.value || dragging.value) return;
           const pt = screenToMapPoint(e.x, e.y, {
             scale: scale.value,
             tx: tx.value,
@@ -691,51 +827,12 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           });
           runOnJS(handleTap2D)(pt.x, pt.y, scale.value);
         }),
-    [scale, tx, ty, handleTap2D]
-  );
-
-  const twoFingerTap2D = useMemo(
-    () =>
-      Gesture.Tap()
-        .minPointers(2)
-        .maxDuration(240)
-        .maxDistance(24)
-        .onEnd((e, success) => {
-          if (!success) return;
-          cancelAnimation(scale);
-          cancelAnimation(tx);
-          cancelAnimation(ty);
-          const target = clampCameraToBounds(
-            zoomAroundFocalPoint(
-              { scale: scale.value, tx: tx.value, ty: ty.value },
-              scale.value * 0.5,
-              e.x,
-              e.y,
-              minZoom,
-              24.0
-            ),
-            { width, height }
-          );
-          const d = reduceMotion ? 0 : 220;
-          scale.value = withTiming(target.scale, { duration: d });
-          tx.value = withTiming(target.tx, { duration: d });
-          ty.value = withTiming(target.ty, { duration: d }, (finished) => {
-            if (finished) {
-              runOnJS(syncSettledCamera)(target.scale, target.tx, target.ty);
-            }
-          });
-        }),
-    [width, height, minZoom, scale, tx, ty, reduceMotion, syncSettledCamera]
+    [scale, tx, ty, multiTouchSeq, dragging, handleTap2D]
   );
 
   const composed2DGesture = useMemo(
-    () =>
-      Gesture.Simultaneous(
-        pinch2D,
-        pan2D,
-        Gesture.Exclusive(twoFingerTap2D, doubleTap2D, singleTap2D)
-      ),
-    [pinch2D, pan2D, twoFingerTap2D, doubleTap2D, singleTap2D]
+    () => Gesture.Simultaneous(camera2D, Gesture.Exclusive(doubleTap2D, singleTap2D)),
+    [camera2D, doubleTap2D, singleTap2D]
   );
 
   // ---------- VoiceOver Map Accessibility Actions ----------
@@ -854,22 +951,123 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
     ]
   );
 
-  // ---------- Greedy Collision-Free Live Skia Labels (ALL 243 countries & territories!) ----------
+  // ---------- Merged Skia Fill Buckets (486 draw calls -> ~8 merged paths!) ----------
+  const mergedLayers = useMemo(() => {
+    const colorBuilders = new Map<string, ReturnType<typeof Skia.PathBuilder.Make>>();
+    const hatchBuilder = Skia.PathBuilder.Make();
+    let hasHatch = false;
+    const livedCentroids: { id: string; cx: number; cy: number }[] = [];
+
+    const addToBucket = (color: string, path: SkPath) => {
+      let builder = colorBuilders.get(color);
+      if (!builder) {
+        builder = Skia.PathBuilder.Make();
+        colorBuilders.set(color, builder);
+      }
+      builder.addPath(path);
+    };
+
+    for (const item of engine2D.places) {
+      const visual = getPlaceVisual(item.id);
+      const isFlooding = activeInk?.placeId === item.id;
+
+      if (isFlooding) {
+        addToBucket(theme.landUnvisited, item.skPath);
+      } else if (visual.kind === 'hatch') {
+        if (hatchEffect) {
+          hatchBuilder.addPath(item.skPath);
+          hasHatch = true;
+        } else {
+          addToBucket(theme.accentSoft, item.skPath);
+        }
+      } else {
+        addToBucket(visual.color, item.skPath);
+      }
+
+      if (visual.isLived) {
+        livedCentroids.push({
+          id: item.id,
+          cx: item.projectedCentroid[0],
+          cy: item.projectedCentroid[1],
+        });
+      }
+    }
+
+    const solidLayers: { color: string; path: SkPath }[] = [];
+    for (const [color, builder] of colorBuilders.entries()) {
+      solidLayers.push({ color, path: builder.detach() });
+    }
+
+    return {
+      solidLayers,
+      hatchPath: hasHatch ? hatchBuilder.detach() : null,
+      livedCentroids,
+    };
+  }, [engine2D.places, getPlaceVisual, activeInk?.placeId, theme.landUnvisited, theme.accentSoft, hatchEffect]);
+
+  // Pre-filtered microstates & favourite stars (keeps settle re-renders lightweight)
+  const visibleMicrostates = useMemo(() => {
+    const out: { id: string; cx: number; cy: number; color: string }[] = [];
+    for (const item of engine2D.places) {
+      if (!item.place.isMicrostate) continue;
+      const status = userPlaces[item.id]?.status ?? 'none';
+      if (status === 'none' && settledCam.scale < 2.5) continue;
+      const dotColor =
+        status === 'visited'
+          ? theme.landVisited
+          : status === 'lived'
+          ? theme.landLived
+          : status === 'wishlist'
+          ? theme.landWishlist
+          : status === 'skipped'
+          ? theme.skippedAccent
+          : theme.border;
+      out.push({
+        id: item.id,
+        cx: item.projectedCentroid[0],
+        cy: item.projectedCentroid[1],
+        color: dotColor,
+      });
+    }
+    return out;
+  }, [engine2D.places, userPlaces, settledCam.scale, theme]);
+
+  const visibleStars = useMemo(() => {
+    const out: { id: string; cx: number; cy: number }[] = [];
+    for (const item of engine2D.places) {
+      const up = userPlaces[item.id];
+      if (!up?.isFavorite || up.deletedAt) continue;
+      if (overlayMode === 'year' && !activeYearPlaceIds.has(item.id)) continue;
+      if (overlayMode === 'visited' && up.status !== 'visited' && up.status !== 'lived') continue;
+      if (overlayMode === 'wishlist' && up.status !== 'wishlist') continue;
+      if (overlayMode === 'skipped' && up.status !== 'skipped') continue;
+      out.push({
+        id: item.id,
+        cx: item.projectedCentroid[0],
+        cy: item.projectedCentroid[1],
+      });
+    }
+    return out;
+  }, [engine2D.places, userPlaces, overlayMode, activeYearPlaceIds]);
+
+  // ---------- Greedy Collision-Free Live Skia Labels (with cached text widths!) ----------
   const visibleLabels = useMemo<LabelCandidate[]>(() => {
     if (settledCam.scale < 1.3 || !labelFont) return [];
     const candidates: (LabelCandidate & { sx: number; sy: number; priority: number })[] = [];
 
     const topEdge = safeInsets.top + (isLandscape ? 52 : 86);
     const bottomEdge = height - Math.max(safeInsets.bottom, 12) - (isLandscape ? 60 : 134);
+    const leftEdge = Math.max(12, safeInsets.left + 8);
+    const rightEdge = width - Math.max(12, safeInsets.right + 8);
 
     for (const item of engine2D.places) {
       const sx = item.projectedCentroid[0] * settledCam.scale + settledCam.tx;
       const sy = item.projectedCentroid[1] * settledCam.scale + settledCam.ty;
-      const textWidth = labelFont.measureText(item.place.name).width;
+      const textWidth = labelWidthCache.get(item.id) ?? 48;
       const halfW = textWidth / 2;
       if (
-        sx - halfW < Math.max(12, safeInsets.left + 8) ||
-        sx + halfW > width - Math.max(12, safeInsets.right + 8) ||
+        sx - halfW < leftEdge ||
+        sx + halfW > rightEdge ||
         sy < topEdge ||
         sy > bottomEdge
       ) {
@@ -948,6 +1146,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
   }, [
     settledCam,
     labelFont,
+    labelWidthCache,
     engine2D.places,
     userPlaces,
     overlayMode,
@@ -984,7 +1183,7 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
       style={[styles.container, { backgroundColor: theme.ocean }]}
       accessible={false}
     >
-      {/* Full-Bleed 60fps 2D Interactive Map Canvas */}
+      {/* Full-Bleed 60/120fps Merged-Path 2D Interactive Map Canvas */}
       <GestureDetector gesture={composed2DGesture}>
         <View
           style={styles.canvasWrap}
@@ -997,9 +1196,12 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
           ]}
           onAccessibilityAction={handleAccessibilityAction}
         >
-          <Canvas style={styles.canvas}>
+          <Canvas style={styles.canvas} opaque>
+            {/* Opaque Ocean Base (eliminates transparent Metal compositing pass!) */}
+            <Rect x={0} y={0} width={width} height={height} color={theme.ocean} />
+
             <Group transform={groupTransform}>
-              {/* Continuous single-ocean graticule + thin cartographic neatline */}
+              {/* Continuous graticule + thin cartographic neatline */}
               <Path
                 path={engine2D.graticulePath}
                 color={theme.graticule}
@@ -1013,37 +1215,17 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
                 strokeWidth={0.75}
               />
 
-              {/* Landfills + Coastline Borders */}
-              {engine2D.places.map((item) => {
-                const visual = getPlaceVisual(item.id);
-                const isFlooding = activeInk?.placeId === item.id;
-                return (
-                  <React.Fragment key={item.id}>
-                    {isFlooding ? (
-                      <Path path={item.skPath} color={theme.landUnvisited} />
-                    ) : visual.kind === 'hatch' && hatchEffect ? (
-                      <Path path={item.skPath}>
-                        <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
-                      </Path>
-                    ) : (
-                      <Path
-                        path={item.skPath}
-                        color={
-                          visual.kind === 'hatch' ? theme.accentSoft : visual.color
-                        }
-                      />
-                    )}
-                    <Path
-                      path={item.skPath}
-                      color={theme.border}
-                      style="stroke"
-                      strokeWidth={adaptiveStroke}
-                      strokeJoin="round"
-                      strokeCap="round"
-                    />
-                  </React.Fragment>
-                );
-              })}
+              {/* Merged Solid Fill Buckets (~5 draw calls total!) */}
+              {mergedLayers.solidLayers.map((layer) => (
+                <Path key={layer.color} path={layer.path} color={layer.color} />
+              ))}
+
+              {/* Single Merged Hatch Bucket (1 Shader draw call!) */}
+              {mergedLayers.hatchPath && hatchEffect && (
+                <Path path={mergedLayers.hatchPath}>
+                  <Shader source={hatchEffect} uniforms={hatchUniforms2D} />
+                </Path>
+              )}
 
               {/* Signature Skia Ink-Flood Animation (clipped to country coastline!) */}
               {activeInk && activeInkCompiled && (
@@ -1066,59 +1248,40 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
                       }
                     />
                   )}
-                  <Path
-                    path={activeInkCompiled.skPath}
-                    color={theme.border}
-                    style="stroke"
-                    strokeWidth={adaptiveStroke}
-                    strokeJoin="round"
-                    strokeCap="round"
-                  />
                 </Group>
               )}
 
+              {/* Single Deduplicated TopoJSON Border Mesh (1 draw call, 1 shared-value read!) */}
+              <Path
+                path={engine2D.borderMeshPath}
+                color={theme.border}
+                style="stroke"
+                strokeWidth={adaptiveStroke}
+              />
+
               {/* Solid Centroid Dot for "Lived" countries */}
-              {engine2D.places.map((item) => {
-                const visual = getPlaceVisual(item.id);
-                if (!visual.isLived) return null;
-                return (
-                  <Circle
-                    key={`lived-${item.id}`}
-                    cx={item.projectedCentroid[0]}
-                    cy={item.projectedCentroid[1]}
-                    r={livedDotRadius}
-                    color={theme.livedDot}
-                  />
-                );
-              })}
+              {mergedLayers.livedCentroids.map((dot) => (
+                <Circle
+                  key={`lived-${dot.id}`}
+                  cx={dot.cx}
+                  cy={dot.cy}
+                  r={livedDotRadius}
+                  color={theme.livedDot}
+                />
+              ))}
 
-              {/* Microstate dots — shown for all microstates/territories when marked or zoomed past 2.5x */}
-              {engine2D.places.map((item) => {
-                if (!item.place.isMicrostate) return null;
-                const status = userPlaces[item.id]?.status ?? 'none';
-                if (status === 'none' && settledCam.scale < 2.5) return null;
-                const dotColor =
-                  status === 'visited'
-                    ? theme.landVisited
-                    : status === 'lived'
-                    ? theme.landLived
-                    : status === 'wishlist'
-                    ? theme.landWishlist
-                    : status === 'skipped'
-                    ? theme.skippedAccent
-                    : theme.border;
-                return (
-                  <Circle
-                    key={`pin-${item.id}`}
-                    cx={item.projectedCentroid[0]}
-                    cy={item.projectedCentroid[1]}
-                    r={pinRadius}
-                    color={dotColor}
-                  />
-                );
-              })}
+              {/* Microstate dots */}
+              {visibleMicrostates.map((ms) => (
+                <Circle
+                  key={`pin-${ms.id}`}
+                  cx={ms.cx}
+                  cy={ms.cy}
+                  r={pinRadius}
+                  color={ms.color}
+                />
+              ))}
 
-              {/* Cased Selection Outline (drawn last with round joins) */}
+              {/* Cased Selection Outline (round joins kept cleanly on selected country only) */}
               {selectedCompiled2D && (
                 <>
                   <Path
@@ -1141,35 +1304,21 @@ export function WorldMapCanvas({ onOpenSearch }: Props) {
               )}
             </Group>
 
-            {/* Starred Favourite Place Markers tracking at 60fps in screen space */}
-            {engine2D.places.map((item) => {
-              const up = userPlaces[item.id];
-              if (!up?.isFavorite || up.deletedAt) return null;
-              if (overlayMode === 'year' && !activeYearPlaceIds.has(item.id)) return null;
-              if (
-                overlayMode === 'visited' &&
-                up.status !== 'visited' &&
-                up.status !== 'lived'
-              ) {
-                return null;
-              }
-              if (overlayMode === 'wishlist' && up.status !== 'wishlist') return null;
-              if (overlayMode === 'skipped' && up.status !== 'skipped') return null;
-              return (
-                <LiveStarMarker2D
-                  key={`star-${item.id}`}
-                  mapX={item.projectedCentroid[0]}
-                  mapY={item.projectedCentroid[1]}
-                  scale={scale}
-                  tx={tx}
-                  ty={ty}
-                  fillColor={theme.favoriteAccent}
-                  haloColor={theme.surface}
-                />
-              );
-            })}
+            {/* Starred Favourite Place Markers tracking at 60/120fps in screen space */}
+            {visibleStars.map((st) => (
+              <LiveStarMarker2D
+                key={`star-${st.id}`}
+                mapX={st.cx}
+                mapY={st.cy}
+                scale={scale}
+                tx={tx}
+                ty={ty}
+                fillColor={theme.favoriteAccent}
+                haloColor={theme.surface}
+              />
+            ))}
 
-            {/* Live 60fps Stroked-Halo Skia Labels tracking the camera on the UI thread */}
+            {/* Live Stroked-Halo Skia Labels tracking the camera on the UI thread */}
             {labelFont &&
               visibleLabels.map((lbl) => (
                 <LiveSkiaLabel

@@ -49,6 +49,14 @@ export interface AgePercentileResult {
   disclaimer: string;
 }
 
+export interface AgePercentileTarget {
+  age: number;
+  targetPercentile: number; // e.g. 95 means "95th percentile" (Top 5%)
+  topPercent: number; // e.g. 5
+  requiredCountries: number;
+  achievable: boolean;
+}
+
 export interface GeographicExtremes {
   northernmost: Place | null;
   southernmost: Place | null;
@@ -361,9 +369,13 @@ function normalCdf(z: number): number {
   return 0.5 * (1 + sign * erf);
 }
 
-// Calibrated age-bracket anchors for international traveler counts (log-normal on count + 1)
-// Derived from international travel survey distributions (Pew / YouGov / UNWTO baselines):
-// Median international countries visited grows with age: ~3 at 18, ~5.5 at 25, ~8 at 35, ~10 at 45, ~12 at 60+
+// Heuristic offline log-normal curve on (countries + 1) by age.
+// NOTE: This is NOT fitted from a single published open microdataset (no public dataset
+// publishes exact global country-count percentiles by single year of age).
+// Values are loosely calibrated toward UK/Western European adult traveler norms
+// (e.g. YouGov UK surveys report an average of ~9.6–12 countries visited over a lifetime,
+// whereas Pew Research US surveys report a much lower median of ~1–2 at ages 18–29 and
+// only 26% of US adults having visited 5+ countries).
 const AGE_BENCHMARK_ANCHORS: { age: number; median: number; sigma: number }[] = [
   { age: 16, median: 2.2, sigma: 0.78 },
   { age: 21, median: 3.6, sigma: 0.82 },
@@ -417,7 +429,7 @@ export function calculateAgePercentile(
       percentile: 1,
       label: `Top 99% for age ${safeAge}`,
       disclaimer:
-        'Estimated from age-stratified international travel survey benchmarks (offline model).',
+        'Rough offline estimate calibrated around UK/European traveler medians (not a published global census).',
     };
   }
 
@@ -440,5 +452,45 @@ export function calculateAgePercentile(
     label: `Top ${displayTop} of travelers aged ${safeAge}`,
     disclaimer:
       'Estimated from age-stratified international travel survey benchmarks (offline model).',
+  };
+}
+
+/**
+ * Computes the exact minimum number of countries needed at `age` to reach or exceed
+ * `targetPercentile` (e.g. 90 = 90th percentile / top 10%, 95 = 95th percentile / top 5%).
+ * Uses exact binary search against `calculateAgePercentile` so results always agree 1:1.
+ */
+export function calculateCountriesForPercentile(
+  age: number,
+  targetPercentile: number,
+  maxCountries = 196
+): AgePercentileTarget {
+  const safeAge = Math.max(10, Math.min(100, Math.round(age)));
+  const clampedPct = Math.max(50, Math.min(99, Math.round(targetPercentile)));
+  const topPercent = Number((100 - clampedPct).toFixed(1));
+  const cap = Math.max(1, Math.round(maxCountries));
+
+  // Binary search for smallest count in [1..cap] whose percentile >= clampedPct
+  let lo = 1;
+  let hi = cap;
+  let answer: number | null = null;
+
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    const res = calculateAgePercentile(safeAge, mid);
+    if (res.percentile >= clampedPct) {
+      answer = mid;
+      hi = mid - 1;
+    } else {
+      lo = mid + 1;
+    }
+  }
+
+  return {
+    age: safeAge,
+    targetPercentile: clampedPct,
+    topPercent,
+    requiredCountries: answer ?? cap,
+    achievable: answer !== null,
   };
 }

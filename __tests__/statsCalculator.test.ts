@@ -1,6 +1,7 @@
 import { PLACES_CATALOG } from '@/data/places';
 import {
   calculateAgePercentile,
+  calculateCountriesForPercentile,
   computeWorldStats,
   computeYearlyStats,
 } from '@/domain/statsCalculator';
@@ -76,5 +77,29 @@ describe('Stats Calculator & Age Percentile', () => {
     const young = calculateAgePercentile(22, 18);
     const older = calculateAgePercentile(55, 18);
     expect(young.topPercent).toBeLessThan(older.topPercent);
+  });
+
+  it('computes the exact minimum countries required for any target percentile at current age', () => {
+    for (const targetPct of [75, 90, 95, 99]) {
+      const res = calculateCountriesForPercentile(28, targetPct, 196);
+      expect(res.achievable).toBe(true);
+      expect(calculateAgePercentile(28, res.requiredCountries).percentile).toBeGreaterThanOrEqual(
+        targetPct
+      );
+      if (res.requiredCountries > 1) {
+        expect(
+          calculateAgePercentile(28, res.requiredCountries - 1).percentile
+        ).toBeLessThan(targetPct);
+      }
+    }
+
+    // Higher target percentile strictly requires at least as many countries
+    const p75 = calculateCountriesForPercentile(30, 75, 196).requiredCountries;
+    const p90 = calculateCountriesForPercentile(30, 90, 196).requiredCountries;
+    const p95 = calculateCountriesForPercentile(30, 95, 196).requiredCountries;
+    const p99 = calculateCountriesForPercentile(30, 99, 196).requiredCountries;
+    expect(p75).toBeLessThan(p90);
+    expect(p90).toBeLessThan(p95);
+    expect(p95).toBeLessThan(p99);
   });
 });
