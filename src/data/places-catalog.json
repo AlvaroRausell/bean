@@ -1,0 +1,6633 @@
+[
+  {
+    "id": "AF",
+    "name": "Afghanistan",
+    "flag": "🇦🇫",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      65.926,
+      33.819
+    ],
+    "bbox": [
+      60.486,
+      29.392,
+      74.891,
+      38.456
+    ],
+    "frameBbox": [
+      60.486,
+      29.392,
+      74.891,
+      38.456
+    ],
+    "areaSr": 0.015818,
+    "isMicrostate": false
+  },
+  {
+    "id": "AX",
+    "name": "Åland",
+    "flag": "🇦🇽",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "searchAliases": [
+      "Aland"
+    ],
+    "centroid": [
+      19.944,
+      60.231
+    ],
+    "bbox": [
+      19.519,
+      60.012,
+      20.611,
+      60.406
+    ],
+    "frameBbox": [
+      19.672,
+      60.082,
+      20.259,
+      60.406
+    ],
+    "areaSr": 0.000018719,
+    "isMicrostate": true
+  },
+  {
+    "id": "AL",
+    "name": "Albania",
+    "flag": "🇦🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      20.052,
+      41.135
+    ],
+    "bbox": [
+      19.281,
+      39.654,
+      21.031,
+      42.648
+    ],
+    "frameBbox": [
+      19.281,
+      39.654,
+      21.031,
+      42.648
+    ],
+    "areaSr": 0.00069808,
+    "isMicrostate": false
+  },
+  {
+    "id": "DZ",
+    "name": "Algeria",
+    "flag": "🇩🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      2.631,
+      28.056
+    ],
+    "bbox": [
+      -8.683,
+      18.987,
+      11.968,
+      37.092
+    ],
+    "frameBbox": [
+      -8.683,
+      18.987,
+      11.968,
+      37.092
+    ],
+    "areaSr": 0.057225,
+    "isMicrostate": false
+  },
+  {
+    "id": "AS",
+    "name": "American Samoa",
+    "flag": "🇦🇸",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -170.718,
+      -14.304
+    ],
+    "bbox": [
+      -170.821,
+      -14.36,
+      -170.568,
+      -14.257
+    ],
+    "frameBbox": [
+      -170.821,
+      -14.36,
+      -170.568,
+      -14.257
+    ],
+    "areaSr": 0.0000029663,
+    "isMicrostate": true
+  },
+  {
+    "id": "AD",
+    "name": "Andorra",
+    "flag": "🇦🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      1.561,
+      42.542
+    ],
+    "bbox": [
+      1.415,
+      42.434,
+      1.74,
+      42.643
+    ],
+    "frameBbox": [
+      1.415,
+      42.434,
+      1.74,
+      42.643
+    ],
+    "areaSr": 0.000010885,
+    "isMicrostate": true
+  },
+  {
+    "id": "AO",
+    "name": "Angola",
+    "flag": "🇦🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      17.56,
+      -12.31
+    ],
+    "bbox": [
+      11.743,
+      -18.02,
+      24.047,
+      -4.429
+    ],
+    "frameBbox": [
+      11.743,
+      -18.02,
+      24.047,
+      -5.855
+    ],
+    "areaSr": 0.030783,
+    "isMicrostate": false
+  },
+  {
+    "id": "AI",
+    "name": "Anguilla",
+    "flag": "🇦🇮",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -63.065,
+      18.224
+    ],
+    "bbox": [
+      -63.16,
+      18.171,
+      -62.98,
+      18.27
+    ],
+    "frameBbox": [
+      -63.16,
+      18.171,
+      -62.98,
+      18.27
+    ],
+    "areaSr": 0.0000020517,
+    "isMicrostate": true
+  },
+  {
+    "id": "AQ",
+    "name": "Antarctica",
+    "flag": "🇦🇶",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Antarctica",
+    "isUnMember": false,
+    "centroid": [
+      83.041,
+      -84.679
+    ],
+    "bbox": [
+      -180,
+      -89.999,
+      180,
+      -60.521
+    ],
+    "frameBbox": [
+      -180,
+      -89.999,
+      180,
+      -63.226
+    ],
+    "areaSr": 0.30196,
+    "isMicrostate": false
+  },
+  {
+    "id": "AG",
+    "name": "Antigua and Barbuda",
+    "flag": "🇦🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -61.79,
+      17.078
+    ],
+    "bbox": [
+      -61.887,
+      16.997,
+      -61.686,
+      17.714
+    ],
+    "frameBbox": [
+      -61.887,
+      16.997,
+      -61.686,
+      17.169
+    ],
+    "areaSr": 0.000010664,
+    "isMicrostate": true
+  },
+  {
+    "id": "AR",
+    "name": "Argentina",
+    "flag": "🇦🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -64.748,
+      -34.535
+    ],
+    "bbox": [
+      -73.576,
+      -55.032,
+      -53.669,
+      -21.803
+    ],
+    "frameBbox": [
+      -73.576,
+      -52.357,
+      -53.669,
+      -21.803
+    ],
+    "areaSr": 0.068557,
+    "isMicrostate": false
+  },
+  {
+    "id": "AM",
+    "name": "Armenia",
+    "flag": "🇦🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      44.938,
+      40.287
+    ],
+    "bbox": [
+      43.439,
+      38.869,
+      46.585,
+      41.291
+    ],
+    "frameBbox": [
+      43.439,
+      38.869,
+      46.585,
+      41.291
+    ],
+    "areaSr": 0.0007282,
+    "isMicrostate": false
+  },
+  {
+    "id": "AW",
+    "name": "Aruba",
+    "flag": "🇦🇼",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -69.983,
+      12.521
+    ],
+    "bbox": [
+      -70.066,
+      12.423,
+      -69.896,
+      12.614
+    ],
+    "frameBbox": [
+      -70.066,
+      12.423,
+      -69.896,
+      12.614
+    ],
+    "areaSr": 0.0000038252,
+    "isMicrostate": true
+  },
+  {
+    "id": "AU",
+    "name": "Australia",
+    "flag": "🇦🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      134.207,
+      -25.632
+    ],
+    "bbox": [
+      112.908,
+      -54.749,
+      158.959,
+      -10.052
+    ],
+    "frameBbox": [
+      113.185,
+      -39.146,
+      153.617,
+      -10.707
+    ],
+    "areaSr": 0.18985,
+    "isMicrostate": false
+  },
+  {
+    "id": "AT",
+    "name": "Austria",
+    "flag": "🇦🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      14.11,
+      47.592
+    ],
+    "bbox": [
+      9.524,
+      46.4,
+      17.147,
+      49.001
+    ],
+    "frameBbox": [
+      9.524,
+      46.4,
+      17.147,
+      49.001
+    ],
+    "areaSr": 0.0020673,
+    "isMicrostate": false
+  },
+  {
+    "id": "AZ",
+    "name": "Azerbaijan",
+    "flag": "🇦🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      47.67,
+      40.342
+    ],
+    "bbox": [
+      44.768,
+      38.399,
+      50.366,
+      41.891
+    ],
+    "frameBbox": [
+      45.001,
+      38.399,
+      50.366,
+      41.891
+    ],
+    "areaSr": 0.0021287,
+    "isMicrostate": false
+  },
+  {
+    "id": "BH",
+    "name": "Bahrain",
+    "flag": "🇧🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      50.542,
+      26.042
+    ],
+    "bbox": [
+      50.452,
+      25.807,
+      50.617,
+      26.246
+    ],
+    "frameBbox": [
+      50.452,
+      25.807,
+      50.617,
+      26.246
+    ],
+    "areaSr": 0.00001334,
+    "isMicrostate": true
+  },
+  {
+    "id": "BD",
+    "name": "Bangladesh",
+    "flag": "🇧🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      90.233,
+      23.891
+    ],
+    "bbox": [
+      88.023,
+      20.79,
+      92.632,
+      26.572
+    ],
+    "frameBbox": [
+      88.023,
+      20.79,
+      92.632,
+      26.572
+    ],
+    "areaSr": 0.003342,
+    "isMicrostate": false
+  },
+  {
+    "id": "BB",
+    "name": "Barbados",
+    "flag": "🇧🇧",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -59.56,
+      13.181
+    ],
+    "bbox": [
+      -59.647,
+      13.062,
+      -59.428,
+      13.318
+    ],
+    "frameBbox": [
+      -59.647,
+      13.062,
+      -59.428,
+      13.318
+    ],
+    "areaSr": 0.0000095913,
+    "isMicrostate": true
+  },
+  {
+    "id": "BY",
+    "name": "Belarus",
+    "flag": "🇧🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      28.015,
+      53.52
+    ],
+    "bbox": [
+      23.175,
+      51.265,
+      32.71,
+      56.146
+    ],
+    "frameBbox": [
+      23.175,
+      51.265,
+      32.71,
+      56.146
+    ],
+    "areaSr": 0.0050922,
+    "isMicrostate": false
+  },
+  {
+    "id": "BE",
+    "name": "Belgium",
+    "flag": "🇧🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      4.646,
+      50.639
+    ],
+    "bbox": [
+      2.525,
+      49.511,
+      6.364,
+      51.491
+    ],
+    "frameBbox": [
+      2.525,
+      49.511,
+      6.364,
+      51.491
+    ],
+    "areaSr": 0.00075467,
+    "isMicrostate": false
+  },
+  {
+    "id": "BZ",
+    "name": "Belize",
+    "flag": "🇧🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -88.719,
+      17.193
+    ],
+    "bbox": [
+      -89.237,
+      15.889,
+      -87.789,
+      18.482
+    ],
+    "frameBbox": [
+      -89.237,
+      15.889,
+      -88.085,
+      18.482
+    ],
+    "areaSr": 0.00056123,
+    "isMicrostate": false
+  },
+  {
+    "id": "BJ",
+    "name": "Benin",
+    "flag": "🇧🇯",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      2.327,
+      9.636
+    ],
+    "bbox": [
+      0.763,
+      6.217,
+      3.834,
+      12.384
+    ],
+    "frameBbox": [
+      0.763,
+      6.217,
+      3.834,
+      12.384
+    ],
+    "areaSr": 0.0028722,
+    "isMicrostate": false
+  },
+  {
+    "id": "BM",
+    "name": "Bermuda",
+    "flag": "🇧🇲",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -64.755,
+      32.314
+    ],
+    "bbox": [
+      -64.863,
+      32.26,
+      -64.668,
+      32.387
+    ],
+    "frameBbox": [
+      -64.863,
+      32.26,
+      -64.668,
+      32.387
+    ],
+    "areaSr": 0.0000016256,
+    "isMicrostate": true
+  },
+  {
+    "id": "BT",
+    "name": "Bhutan",
+    "flag": "🇧🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      90.402,
+      27.412
+    ],
+    "bbox": [
+      88.739,
+      26.702,
+      92.083,
+      28.311
+    ],
+    "frameBbox": [
+      88.739,
+      26.702,
+      92.083,
+      28.311
+    ],
+    "areaSr": 0.00098243,
+    "isMicrostate": false
+  },
+  {
+    "id": "BO",
+    "name": "Bolivia",
+    "flag": "🇧🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -64.698,
+      -16.682
+    ],
+    "bbox": [
+      -69.646,
+      -22.892,
+      -57.496,
+      -9.71
+    ],
+    "frameBbox": [
+      -69.646,
+      -22.892,
+      -57.496,
+      -9.71
+    ],
+    "areaSr": 0.026861,
+    "isMicrostate": false
+  },
+  {
+    "id": "BA",
+    "name": "Bosnia and Herzegovina",
+    "flag": "🇧🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      17.775,
+      44.171
+    ],
+    "bbox": [
+      15.737,
+      42.56,
+      19.584,
+      45.277
+    ],
+    "frameBbox": [
+      15.737,
+      42.56,
+      19.584,
+      45.277
+    ],
+    "areaSr": 0.0012733,
+    "isMicrostate": false
+  },
+  {
+    "id": "BW",
+    "name": "Botswana",
+    "flag": "🇧🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      23.809,
+      -22.165
+    ],
+    "bbox": [
+      19.977,
+      -26.854,
+      29.365,
+      -17.788
+    ],
+    "frameBbox": [
+      19.977,
+      -26.854,
+      29.365,
+      -17.788
+    ],
+    "areaSr": 0.014305,
+    "isMicrostate": false
+  },
+  {
+    "id": "BR",
+    "name": "Brazil",
+    "flag": "🇧🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -53.237,
+      -10.693
+    ],
+    "bbox": [
+      -74.002,
+      -33.742,
+      -34.805,
+      5.258
+    ],
+    "frameBbox": [
+      -74.002,
+      -33.742,
+      -34.805,
+      5.258
+    ],
+    "areaSr": 0.2094,
+    "isMicrostate": false
+  },
+  {
+    "id": "IO",
+    "name": "British Indian Ocean Territory",
+    "flag": "🇮🇴",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "centroid": [
+      72.445,
+      -7.331
+    ],
+    "bbox": [
+      72.35,
+      -7.435,
+      72.499,
+      -7.22
+    ],
+    "frameBbox": [
+      72.35,
+      -7.435,
+      72.499,
+      -7.22
+    ],
+    "areaSr": 0.0000032621,
+    "isMicrostate": true
+  },
+  {
+    "id": "VG",
+    "name": "British Virgin Islands",
+    "flag": "🇻🇬",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -64.621,
+      18.423
+    ],
+    "bbox": [
+      -64.695,
+      18.399,
+      -64.274,
+      18.753
+    ],
+    "frameBbox": [
+      -64.695,
+      18.399,
+      -64.545,
+      18.446
+    ],
+    "areaSr": 0.0000033349,
+    "isMicrostate": true
+  },
+  {
+    "id": "BN",
+    "name": "Brunei",
+    "flag": "🇧🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      114.592,
+      4.49
+    ],
+    "bbox": [
+      114.064,
+      4.024,
+      115.327,
+      5.022
+    ],
+    "frameBbox": [
+      114.064,
+      4.024,
+      115.048,
+      5.022
+    ],
+    "areaSr": 0.00013974,
+    "isMicrostate": true
+  },
+  {
+    "id": "BG",
+    "name": "Bulgaria",
+    "flag": "🇧🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      25.209,
+      42.771
+    ],
+    "bbox": [
+      22.344,
+      41.244,
+      28.585,
+      44.238
+    ],
+    "frameBbox": [
+      22.344,
+      41.244,
+      28.585,
+      44.238
+    ],
+    "areaSr": 0.0027697,
+    "isMicrostate": false
+  },
+  {
+    "id": "BF",
+    "name": "Burkina Faso",
+    "flag": "🇧🇫",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -1.761,
+      12.271
+    ],
+    "bbox": [
+      -5.524,
+      9.425,
+      2.389,
+      15.078
+    ],
+    "frameBbox": [
+      -5.524,
+      9.425,
+      2.389,
+      15.078
+    ],
+    "areaSr": 0.0067427,
+    "isMicrostate": false
+  },
+  {
+    "id": "BI",
+    "name": "Burundi",
+    "flag": "🇧🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      29.875,
+      -3.359
+    ],
+    "bbox": [
+      29.014,
+      -4.456,
+      30.811,
+      -2.313
+    ],
+    "frameBbox": [
+      29.014,
+      -4.456,
+      30.811,
+      -2.313
+    ],
+    "areaSr": 0.0006703,
+    "isMicrostate": false
+  },
+  {
+    "id": "KH",
+    "name": "Cambodia",
+    "flag": "🇰🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      104.906,
+      12.72
+    ],
+    "bbox": [
+      102.32,
+      10.411,
+      107.605,
+      14.705
+    ],
+    "frameBbox": [
+      102.32,
+      10.411,
+      107.605,
+      14.705
+    ],
+    "areaSr": 0.0044682,
+    "isMicrostate": false
+  },
+  {
+    "id": "CM",
+    "name": "Cameroon",
+    "flag": "🇨🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      12.734,
+      5.681
+    ],
+    "bbox": [
+      8.533,
+      1.676,
+      16.183,
+      13.079
+    ],
+    "frameBbox": [
+      8.533,
+      1.676,
+      16.183,
+      13.079
+    ],
+    "areaSr": 0.011478,
+    "isMicrostate": false
+  },
+  {
+    "id": "CA",
+    "name": "Canada",
+    "flag": "🇨🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -99.005,
+      58.592
+    ],
+    "bbox": [
+      -141.002,
+      41.675,
+      -52.654,
+      83.116
+    ],
+    "frameBbox": [
+      -141.002,
+      41.675,
+      -55.673,
+      71.987
+    ],
+    "areaSr": 0.24322,
+    "isMicrostate": false
+  },
+  {
+    "id": "CV",
+    "name": "Cape Verde",
+    "flag": "🇨🇻",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "searchAliases": [
+      "Cabo Verde"
+    ],
+    "centroid": [
+      -23.637,
+      15.082
+    ],
+    "bbox": [
+      -25.342,
+      14.818,
+      -22.682,
+      17.194
+    ],
+    "frameBbox": [
+      -23.785,
+      14.916,
+      -23.444,
+      15.329
+    ],
+    "areaSr": 0.000088325,
+    "isMicrostate": true
+  },
+  {
+    "id": "KY",
+    "name": "Cayman Islands",
+    "flag": "🇰🇾",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -81.285,
+      19.321
+    ],
+    "bbox": [
+      -81.419,
+      19.272,
+      -79.742,
+      19.766
+    ],
+    "frameBbox": [
+      -81.419,
+      19.272,
+      -81.107,
+      19.385
+    ],
+    "areaSr": 0.0000074235,
+    "isMicrostate": true
+  },
+  {
+    "id": "CF",
+    "name": "Central African Republic",
+    "flag": "🇨🇫",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      20.462,
+      6.572
+    ],
+    "bbox": [
+      14.431,
+      2.27,
+      27.403,
+      10.996
+    ],
+    "frameBbox": [
+      14.431,
+      2.27,
+      27.403,
+      10.996
+    ],
+    "areaSr": 0.015299,
+    "isMicrostate": false
+  },
+  {
+    "id": "TD",
+    "name": "Chad",
+    "flag": "🇹🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      18.635,
+      15.275
+    ],
+    "bbox": [
+      13.448,
+      7.475,
+      23.983,
+      23.445
+    ],
+    "frameBbox": [
+      13.448,
+      7.475,
+      23.983,
+      23.445
+    ],
+    "areaSr": 0.031314,
+    "isMicrostate": false
+  },
+  {
+    "id": "CL",
+    "name": "Chile",
+    "flag": "🇨🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -70.95,
+      -34.362
+    ],
+    "bbox": [
+      -109.434,
+      -55.892,
+      -66.436,
+      -17.506
+    ],
+    "frameBbox": [
+      -75.708,
+      -53.883,
+      -67.009,
+      -17.506
+    ],
+    "areaSr": 0.018168,
+    "isMicrostate": false
+  },
+  {
+    "id": "CO",
+    "name": "Colombia",
+    "flag": "🇨🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -73.077,
+      3.904
+    ],
+    "bbox": [
+      -79.025,
+      -4.236,
+      -66.876,
+      12.434
+    ],
+    "frameBbox": [
+      -79.025,
+      -4.236,
+      -66.876,
+      12.434
+    ],
+    "areaSr": 0.028072,
+    "isMicrostate": false
+  },
+  {
+    "id": "KM",
+    "name": "Comoros",
+    "flag": "🇰🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      43.339,
+      -11.654
+    ],
+    "bbox": [
+      43.227,
+      -12.368,
+      44.527,
+      -11.368
+    ],
+    "frameBbox": [
+      43.227,
+      -11.915,
+      43.492,
+      -11.368
+    ],
+    "areaSr": 0.00003907,
+    "isMicrostate": true
+  },
+  {
+    "id": "CK",
+    "name": "Cook Islands",
+    "flag": "🇨🇰",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -159.787,
+      -21.219
+    ],
+    "bbox": [
+      -159.842,
+      -21.25,
+      -159.737,
+      -21.186
+    ],
+    "frameBbox": [
+      -159.842,
+      -21.25,
+      -159.737,
+      -21.186
+    ],
+    "areaSr": 0.0000014943,
+    "isMicrostate": true
+  },
+  {
+    "id": "CR",
+    "name": "Costa Rica",
+    "flag": "🇨🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -84.19,
+      9.976
+    ],
+    "bbox": [
+      -85.908,
+      8.071,
+      -82.564,
+      11.189
+    ],
+    "frameBbox": [
+      -85.908,
+      8.071,
+      -82.564,
+      11.189
+    ],
+    "areaSr": 0.0012691,
+    "isMicrostate": false
+  },
+  {
+    "id": "HR",
+    "name": "Croatia",
+    "flag": "🇭🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      16.419,
+      45.157
+    ],
+    "bbox": [
+      13.517,
+      42.433,
+      19.401,
+      46.535
+    ],
+    "frameBbox": [
+      13.517,
+      42.938,
+      19.401,
+      46.535
+    ],
+    "areaSr": 0.0013407,
+    "isMicrostate": false
+  },
+  {
+    "id": "CU",
+    "name": "Cuba",
+    "flag": "🇨🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -78.913,
+      21.629
+    ],
+    "bbox": [
+      -84.887,
+      19.855,
+      -74.137,
+      23.19
+    ],
+    "frameBbox": [
+      -84.887,
+      19.855,
+      -74.137,
+      23.19
+    ],
+    "areaSr": 0.0026927,
+    "isMicrostate": false
+  },
+  {
+    "id": "CW",
+    "name": "Curaçao",
+    "flag": "🇨🇼",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -68.971,
+      12.196
+    ],
+    "bbox": [
+      -69.159,
+      12.045,
+      -68.751,
+      12.38
+    ],
+    "frameBbox": [
+      -69.159,
+      12.045,
+      -68.751,
+      12.38
+    ],
+    "areaSr": 0.000010586,
+    "isMicrostate": true
+  },
+  {
+    "id": "CY",
+    "name": "Cyprus",
+    "flag": "🇨🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      33.006,
+      34.917
+    ],
+    "bbox": [
+      32.301,
+      34.57,
+      34.05,
+      35.183
+    ],
+    "frameBbox": [
+      32.301,
+      34.57,
+      34.05,
+      35.183
+    ],
+    "areaSr": 0.00014062,
+    "isMicrostate": true
+  },
+  {
+    "id": "CZ",
+    "name": "Czech Republic",
+    "flag": "🇨🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "Czechia"
+    ],
+    "centroid": [
+      15.319,
+      49.738
+    ],
+    "bbox": [
+      12.09,
+      48.576,
+      18.832,
+      51.038
+    ],
+    "frameBbox": [
+      12.09,
+      48.576,
+      18.832,
+      51.038
+    ],
+    "areaSr": 0.0019335,
+    "isMicrostate": false
+  },
+  {
+    "id": "CD",
+    "name": "Democratic Republic of the Congo",
+    "flag": "🇨🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      23.638,
+      -2.865
+    ],
+    "bbox": [
+      12.214,
+      -13.454,
+      31.274,
+      5.312
+    ],
+    "frameBbox": [
+      12.214,
+      -13.454,
+      31.274,
+      5.312
+    ],
+    "areaSr": 0.057518,
+    "isMicrostate": false
+  },
+  {
+    "id": "DK",
+    "name": "Denmark",
+    "flag": "🇩🇰",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      9.348,
+      56.231
+    ],
+    "bbox": [
+      8.121,
+      54.629,
+      15.137,
+      57.737
+    ],
+    "frameBbox": [
+      8.121,
+      54.806,
+      10.926,
+      57.737
+    ],
+    "areaSr": 0.001045,
+    "isMicrostate": false
+  },
+  {
+    "id": "DJ",
+    "name": "Djibouti",
+    "flag": "🇩🇯",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      42.56,
+      11.748
+    ],
+    "bbox": [
+      41.765,
+      10.941,
+      43.41,
+      12.709
+    ],
+    "frameBbox": [
+      41.765,
+      10.941,
+      43.41,
+      12.709
+    ],
+    "areaSr": 0.00053472,
+    "isMicrostate": false
+  },
+  {
+    "id": "DM",
+    "name": "Dominica",
+    "flag": "🇩🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -61.358,
+      15.439
+    ],
+    "bbox": [
+      -61.481,
+      15.227,
+      -61.251,
+      15.633
+    ],
+    "frameBbox": [
+      -61.481,
+      15.227,
+      -61.251,
+      15.633
+    ],
+    "areaSr": 0.000017193,
+    "isMicrostate": true
+  },
+  {
+    "id": "DO",
+    "name": "Dominican Republic",
+    "flag": "🇩🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -70.505,
+      18.895
+    ],
+    "bbox": [
+      -72,
+      17.636,
+      -68.339,
+      19.914
+    ],
+    "frameBbox": [
+      -72,
+      17.636,
+      -68.339,
+      19.914
+    ],
+    "areaSr": 0.0011971,
+    "isMicrostate": false
+  },
+  {
+    "id": "TL",
+    "name": "East Timor",
+    "flag": "🇹🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      125.923,
+      -8.81
+    ],
+    "bbox": [
+      124.036,
+      -9.512,
+      127.296,
+      -8.14
+    ],
+    "frameBbox": [
+      124.915,
+      -9.512,
+      127.296,
+      -8.316
+    ],
+    "areaSr": 0.00037006,
+    "isMicrostate": false
+  },
+  {
+    "id": "EC",
+    "name": "Ecuador",
+    "flag": "🇪🇨",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -78.389,
+      -1.445
+    ],
+    "bbox": [
+      -91.654,
+      -4.991,
+      -75.25,
+      1.455
+    ],
+    "frameBbox": [
+      -80.963,
+      -4.991,
+      -75.25,
+      1.455
+    ],
+    "areaSr": 0.0062988,
+    "isMicrostate": false
+  },
+  {
+    "id": "EG",
+    "name": "Egypt",
+    "flag": "🇪🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      29.878,
+      26.46
+    ],
+    "bbox": [
+      24.703,
+      21.995,
+      36.871,
+      31.655
+    ],
+    "frameBbox": [
+      24.703,
+      21.995,
+      36.871,
+      31.655
+    ],
+    "areaSr": 0.024725,
+    "isMicrostate": false
+  },
+  {
+    "id": "SV",
+    "name": "El Salvador",
+    "flag": "🇸🇻",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -88.871,
+      13.74
+    ],
+    "bbox": [
+      -90.106,
+      13.164,
+      -87.715,
+      14.431
+    ],
+    "frameBbox": [
+      -90.106,
+      13.164,
+      -87.715,
+      14.431
+    ],
+    "areaSr": 0.00050237,
+    "isMicrostate": false
+  },
+  {
+    "id": "GB-ENG",
+    "name": "England",
+    "flag": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+    "kind": "constituent_country",
+    "parentId": "GB",
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "United Kingdom",
+      "UK",
+      "Britain",
+      "Great Britain"
+    ],
+    "centroid": [
+      -1.461,
+      52.572
+    ],
+    "bbox": [
+      -5.656,
+      50.021,
+      1.747,
+      55.808
+    ],
+    "frameBbox": [
+      -5.656,
+      50.021,
+      1.747,
+      55.808
+    ],
+    "areaSr": 0.0031861,
+    "isMicrostate": false
+  },
+  {
+    "id": "GQ",
+    "name": "Equatorial Guinea",
+    "flag": "🇬🇶",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      10.47,
+      1.565
+    ],
+    "bbox": [
+      8.434,
+      0.96,
+      11.335,
+      3.758
+    ],
+    "frameBbox": [
+      9.386,
+      0.96,
+      11.335,
+      2.304
+    ],
+    "areaSr": 0.00065642,
+    "isMicrostate": false
+  },
+  {
+    "id": "ER",
+    "name": "Eritrea",
+    "flag": "🇪🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      38.849,
+      15.359
+    ],
+    "bbox": [
+      36.427,
+      12.377,
+      43.117,
+      18.005
+    ],
+    "frameBbox": [
+      36.427,
+      12.377,
+      43.117,
+      18.005
+    ],
+    "areaSr": 0.0030472,
+    "isMicrostate": false
+  },
+  {
+    "id": "EE",
+    "name": "Estonia",
+    "flag": "🇪🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      25.838,
+      58.683
+    ],
+    "bbox": [
+      21.854,
+      57.525,
+      28.151,
+      59.639
+    ],
+    "frameBbox": [
+      23.432,
+      57.525,
+      28.151,
+      59.639
+    ],
+    "areaSr": 0.0011199,
+    "isMicrostate": false
+  },
+  {
+    "id": "SZ",
+    "name": "Eswatini",
+    "flag": "🇸🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "searchAliases": [
+      "eSwatini"
+    ],
+    "centroid": [
+      31.482,
+      -26.558
+    ],
+    "bbox": [
+      30.788,
+      -27.31,
+      32.113,
+      -25.743
+    ],
+    "frameBbox": [
+      30.788,
+      -27.31,
+      32.113,
+      -25.743
+    ],
+    "areaSr": 0.00041863,
+    "isMicrostate": false
+  },
+  {
+    "id": "ET",
+    "name": "Ethiopia",
+    "flag": "🇪🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      39.61,
+      8.614
+    ],
+    "bbox": [
+      32.999,
+      3.456,
+      47.978,
+      14.852
+    ],
+    "frameBbox": [
+      32.999,
+      3.456,
+      47.978,
+      14.852
+    ],
+    "areaSr": 0.027884,
+    "isMicrostate": false
+  },
+  {
+    "id": "FK",
+    "name": "Falkland Islands",
+    "flag": "🇫🇰",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": false,
+    "centroid": [
+      -58.758,
+      -51.745
+    ],
+    "bbox": [
+      -61.145,
+      -52.308,
+      -57.792,
+      -51.27
+    ],
+    "frameBbox": [
+      -59.649,
+      -52.308,
+      -57.792,
+      -51.27
+    ],
+    "areaSr": 0.00028053,
+    "isMicrostate": false
+  },
+  {
+    "id": "FO",
+    "name": "Faroe Islands",
+    "flag": "🇫🇴",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "centroid": [
+      -6.884,
+      62.17
+    ],
+    "bbox": [
+      -7.423,
+      61.414,
+      -6.406,
+      62.356
+    ],
+    "frameBbox": [
+      -7.172,
+      61.951,
+      -6.631,
+      62.316
+    ],
+    "areaSr": 0.000025502,
+    "isMicrostate": true
+  },
+  {
+    "id": "FM",
+    "name": "Federated States of Micronesia",
+    "flag": "🇫🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      158.233,
+      6.886
+    ],
+    "bbox": [
+      138.062,
+      5.277,
+      162.993,
+      9.593
+    ],
+    "frameBbox": [
+      158.128,
+      6.791,
+      158.335,
+      6.978
+    ],
+    "areaSr": 0.000012912,
+    "isMicrostate": true
+  },
+  {
+    "id": "FJ",
+    "name": "Fiji",
+    "flag": "🇫🇯",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      177.973,
+      -17.823
+    ],
+    "bbox": [
+      174.587,
+      -21.706,
+      -178.251,
+      -12.477
+    ],
+    "frameBbox": [
+      176.5,
+      -19.5,
+      180,
+      -16
+    ],
+    "areaSr": 0.00045348,
+    "isMicrostate": false
+  },
+  {
+    "id": "FI",
+    "name": "Finland",
+    "flag": "🇫🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      26.206,
+      64.261
+    ],
+    "bbox": [
+      20.622,
+      59.816,
+      31.537,
+      70.065
+    ],
+    "frameBbox": [
+      20.622,
+      59.816,
+      31.537,
+      70.065
+    ],
+    "areaSr": 0.0081423,
+    "isMicrostate": false
+  },
+  {
+    "id": "FR",
+    "name": "France",
+    "flag": "🇫🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      2.461,
+      46.572
+    ],
+    "bbox": [
+      -61.794,
+      -21.369,
+      55.839,
+      51.097
+    ],
+    "frameBbox": [
+      -5.5,
+      41.2,
+      9.8,
+      51.3
+    ],
+    "areaSr": 0.015645,
+    "isMicrostate": false
+  },
+  {
+    "id": "PF",
+    "name": "French Polynesia",
+    "flag": "🇵🇫",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -149.42,
+      -17.663
+    ],
+    "bbox": [
+      -151.512,
+      -20.876,
+      -136.294,
+      -8.782
+    ],
+    "frameBbox": [
+      -149.635,
+      -17.862,
+      -149.151,
+      -17.496
+    ],
+    "areaSr": 0.00006442,
+    "isMicrostate": true
+  },
+  {
+    "id": "TF",
+    "name": "French Southern and Antarctic Lands",
+    "flag": "🇹🇫",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "centroid": [
+      69.495,
+      -49.304
+    ],
+    "bbox": [
+      51.659,
+      -49.71,
+      70.555,
+      -46.327
+    ],
+    "frameBbox": [
+      68.77,
+      -49.71,
+      70.555,
+      -48.656
+    ],
+    "areaSr": 0.00017176,
+    "isMicrostate": true
+  },
+  {
+    "id": "GA",
+    "name": "Gabon",
+    "flag": "🇬🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      11.789,
+      -0.586
+    ],
+    "bbox": [
+      8.703,
+      -3.916,
+      14.481,
+      2.302
+    ],
+    "frameBbox": [
+      8.703,
+      -3.916,
+      14.481,
+      2.302
+    ],
+    "areaSr": 0.0064219,
+    "isMicrostate": false
+  },
+  {
+    "id": "GE",
+    "name": "Georgia",
+    "flag": "🇬🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      43.524,
+      42.173
+    ],
+    "bbox": [
+      39.978,
+      41.07,
+      46.673,
+      43.57
+    ],
+    "frameBbox": [
+      39.978,
+      41.07,
+      46.673,
+      43.57
+    ],
+    "areaSr": 0.0017074,
+    "isMicrostate": false
+  },
+  {
+    "id": "DE",
+    "name": "Germany",
+    "flag": "🇩🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      10.352,
+      51.032
+    ],
+    "bbox": [
+      5.858,
+      47.279,
+      15.017,
+      55.059
+    ],
+    "frameBbox": [
+      5.858,
+      47.279,
+      15.017,
+      54.903
+    ],
+    "areaSr": 0.0087748,
+    "isMicrostate": false
+  },
+  {
+    "id": "GH",
+    "name": "Ghana",
+    "flag": "🇬🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -1.217,
+      7.948
+    ],
+    "bbox": [
+      -3.244,
+      4.762,
+      1.187,
+      11.167
+    ],
+    "frameBbox": [
+      -3.244,
+      4.762,
+      1.187,
+      11.167
+    ],
+    "areaSr": 0.0059021,
+    "isMicrostate": false
+  },
+  {
+    "id": "GR",
+    "name": "Greece",
+    "flag": "🇬🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      22.566,
+      39.461
+    ],
+    "bbox": [
+      19.646,
+      34.934,
+      28.232,
+      41.744
+    ],
+    "frameBbox": [
+      20.001,
+      36.447,
+      26.625,
+      41.744
+    ],
+    "areaSr": 0.0032068,
+    "isMicrostate": false
+  },
+  {
+    "id": "GL",
+    "name": "Greenland",
+    "flag": "🇬🇱",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -41.803,
+      73.084
+    ],
+    "bbox": [
+      -72.818,
+      59.815,
+      -11.426,
+      83.6
+    ],
+    "frameBbox": [
+      -72.818,
+      59.815,
+      -11.426,
+      83.6
+    ],
+    "areaSr": 0.053086,
+    "isMicrostate": false
+  },
+  {
+    "id": "GD",
+    "name": "Grenada",
+    "flag": "🇬🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -61.682,
+      12.117
+    ],
+    "bbox": [
+      -61.782,
+      12.008,
+      -61.607,
+      12.237
+    ],
+    "frameBbox": [
+      -61.782,
+      12.008,
+      -61.607,
+      12.237
+    ],
+    "areaSr": 0.0000070467,
+    "isMicrostate": true
+  },
+  {
+    "id": "GU",
+    "name": "Guam",
+    "flag": "🇬🇺",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      144.768,
+      13.442
+    ],
+    "bbox": [
+      144.649,
+      13.258,
+      144.941,
+      13.622
+    ],
+    "frameBbox": [
+      144.649,
+      13.258,
+      144.941,
+      13.622
+    ],
+    "areaSr": 0.00001188,
+    "isMicrostate": true
+  },
+  {
+    "id": "GT",
+    "name": "Guatemala",
+    "flag": "🇬🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -90.367,
+      15.69
+    ],
+    "bbox": [
+      -92.235,
+      13.737,
+      -88.228,
+      17.816
+    ],
+    "frameBbox": [
+      -92.235,
+      13.737,
+      -88.228,
+      17.816
+    ],
+    "areaSr": 0.0026726,
+    "isMicrostate": false
+  },
+  {
+    "id": "GG",
+    "name": "Guernsey",
+    "flag": "🇬🇬",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "centroid": [
+      -2.572,
+      49.468
+    ],
+    "bbox": [
+      -2.646,
+      49.429,
+      -2.512,
+      49.507
+    ],
+    "frameBbox": [
+      -2.646,
+      49.429,
+      -2.512,
+      49.507
+    ],
+    "areaSr": 0.0000011839,
+    "isMicrostate": true
+  },
+  {
+    "id": "GN",
+    "name": "Guinea",
+    "flag": "🇬🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -10.934,
+      10.437
+    ],
+    "bbox": [
+      -15.051,
+      7.216,
+      -7.681,
+      12.674
+    ],
+    "frameBbox": [
+      -15.051,
+      7.216,
+      -7.681,
+      12.674
+    ],
+    "areaSr": 0.0060342,
+    "isMicrostate": false
+  },
+  {
+    "id": "GW",
+    "name": "Guinea-Bissau",
+    "flag": "🇬🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -14.924,
+      12.064
+    ],
+    "bbox": [
+      -16.712,
+      10.94,
+      -13.674,
+      12.68
+    ],
+    "frameBbox": [
+      -16.712,
+      10.94,
+      -13.674,
+      12.68
+    ],
+    "areaSr": 0.00078976,
+    "isMicrostate": false
+  },
+  {
+    "id": "GY",
+    "name": "Guyana",
+    "flag": "🇬🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -58.98,
+      4.79
+    ],
+    "bbox": [
+      -61.391,
+      1.201,
+      -56.483,
+      8.549
+    ],
+    "frameBbox": [
+      -61.391,
+      1.201,
+      -56.483,
+      8.549
+    ],
+    "areaSr": 0.0052217,
+    "isMicrostate": false
+  },
+  {
+    "id": "HT",
+    "name": "Haiti",
+    "flag": "🇭🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -72.677,
+      18.928
+    ],
+    "bbox": [
+      -74.478,
+      18.039,
+      -71.645,
+      20.094
+    ],
+    "frameBbox": [
+      -74.478,
+      18.039,
+      -71.645,
+      19.928
+    ],
+    "areaSr": 0.00066042,
+    "isMicrostate": false
+  },
+  {
+    "id": "HM",
+    "name": "Heard Island and McDonald Islands",
+    "flag": "🇭🇲",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      73.52,
+      -53.087
+    ],
+    "bbox": [
+      73.251,
+      -53.185,
+      73.838,
+      -52.966
+    ],
+    "frameBbox": [
+      73.251,
+      -53.185,
+      73.838,
+      -52.966
+    ],
+    "areaSr": 0.000010312,
+    "isMicrostate": true
+  },
+  {
+    "id": "HN",
+    "name": "Honduras",
+    "flag": "🇭🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -86.618,
+      14.826
+    ],
+    "bbox": [
+      -89.363,
+      12.979,
+      -83.158,
+      16.514
+    ],
+    "frameBbox": [
+      -89.363,
+      12.979,
+      -83.158,
+      16.024
+    ],
+    "areaSr": 0.0027967,
+    "isMicrostate": false
+  },
+  {
+    "id": "HK",
+    "name": "Hong Kong",
+    "flag": "🇭🇰",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "searchAliases": [
+      "Hong Kong S.A.R."
+    ],
+    "centroid": [
+      114.139,
+      22.439
+    ],
+    "bbox": [
+      113.839,
+      22.195,
+      114.335,
+      22.565
+    ],
+    "frameBbox": [
+      113.896,
+      22.296,
+      114.335,
+      22.565
+    ],
+    "areaSr": 0.000025349,
+    "isMicrostate": true
+  },
+  {
+    "id": "HU",
+    "name": "Hungary",
+    "flag": "🇭🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      19.379,
+      47.166
+    ],
+    "bbox": [
+      16.093,
+      45.753,
+      22.877,
+      48.553
+    ],
+    "frameBbox": [
+      16.093,
+      45.753,
+      22.877,
+      48.553
+    ],
+    "areaSr": 0.0022902,
+    "isMicrostate": false
+  },
+  {
+    "id": "IS",
+    "name": "Iceland",
+    "flag": "🇮🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      -18.58,
+      64.998
+    ],
+    "bbox": [
+      -24.476,
+      63.407,
+      -13.556,
+      66.526
+    ],
+    "frameBbox": [
+      -24.476,
+      63.407,
+      -13.556,
+      66.526
+    ],
+    "areaSr": 0.0024921,
+    "isMicrostate": false
+  },
+  {
+    "id": "IN",
+    "name": "India",
+    "flag": "🇮🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      79.534,
+      22.8
+    ],
+    "bbox": [
+      68.165,
+      6.749,
+      97.344,
+      35.496
+    ],
+    "frameBbox": [
+      68.165,
+      8.078,
+      97.344,
+      35.496
+    ],
+    "areaSr": 0.077749,
+    "isMicrostate": false
+  },
+  {
+    "id": "ID",
+    "name": "Indonesia",
+    "flag": "🇮🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      114.014,
+      -0.191
+    ],
+    "bbox": [
+      95.207,
+      -10.91,
+      140.976,
+      5.907
+    ],
+    "frameBbox": [
+      108.906,
+      -4.17,
+      118.985,
+      4.371
+    ],
+    "areaSr": 0.046124,
+    "isMicrostate": false
+  },
+  {
+    "id": "IR",
+    "name": "Iran",
+    "flag": "🇮🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      54.44,
+      32.532
+    ],
+    "bbox": [
+      44.023,
+      25.102,
+      63.305,
+      39.769
+    ],
+    "frameBbox": [
+      44.023,
+      25.102,
+      63.305,
+      39.769
+    ],
+    "areaSr": 0.039981,
+    "isMicrostate": false
+  },
+  {
+    "id": "IQ",
+    "name": "Iraq",
+    "flag": "🇮🇶",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      43.774,
+      33.01
+    ],
+    "bbox": [
+      38.774,
+      29.064,
+      48.546,
+      37.372
+    ],
+    "frameBbox": [
+      38.774,
+      29.064,
+      48.546,
+      37.372
+    ],
+    "areaSr": 0.010777,
+    "isMicrostate": false
+  },
+  {
+    "id": "IE",
+    "name": "Ireland",
+    "flag": "🇮🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      -8.142,
+      53.161
+    ],
+    "bbox": [
+      -10.39,
+      51.474,
+      -6.027,
+      55.366
+    ],
+    "frameBbox": [
+      -10.39,
+      51.474,
+      -6.027,
+      55.366
+    ],
+    "areaSr": 0.0016925,
+    "isMicrostate": false
+  },
+  {
+    "id": "IM",
+    "name": "Isle of Man",
+    "flag": "🇮🇲",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "centroid": [
+      -4.539,
+      54.224
+    ],
+    "bbox": [
+      -4.785,
+      54.059,
+      -4.338,
+      54.407
+    ],
+    "frameBbox": [
+      -4.785,
+      54.059,
+      -4.338,
+      54.407
+    ],
+    "areaSr": 0.00001373,
+    "isMicrostate": true
+  },
+  {
+    "id": "IL",
+    "name": "Israel",
+    "flag": "🇮🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      34.991,
+      31.433
+    ],
+    "bbox": [
+      34.245,
+      29.477,
+      35.888,
+      33.416
+    ],
+    "frameBbox": [
+      34.245,
+      29.477,
+      35.888,
+      33.416
+    ],
+    "areaSr": 0.00054327,
+    "isMicrostate": false
+  },
+  {
+    "id": "IT",
+    "name": "Italy",
+    "flag": "🇮🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      12.301,
+      43.486
+    ],
+    "bbox": [
+      6.628,
+      36.688,
+      18.486,
+      47.082
+    ],
+    "frameBbox": [
+      6.628,
+      37.939,
+      18.486,
+      47.082
+    ],
+    "areaSr": 0.0073981,
+    "isMicrostate": false
+  },
+  {
+    "id": "CI",
+    "name": "Ivory Coast",
+    "flag": "🇨🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -5.57,
+      7.626
+    ],
+    "bbox": [
+      -8.604,
+      4.351,
+      -2.506,
+      10.724
+    ],
+    "frameBbox": [
+      -8.604,
+      4.351,
+      -2.506,
+      10.724
+    ],
+    "areaSr": 0.0079403,
+    "isMicrostate": false
+  },
+  {
+    "id": "JM",
+    "name": "Jamaica",
+    "flag": "🇯🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -77.314,
+      18.157
+    ],
+    "bbox": [
+      -78.34,
+      17.715,
+      -76.211,
+      18.522
+    ],
+    "frameBbox": [
+      -78.34,
+      17.715,
+      -76.211,
+      18.522
+    ],
+    "areaSr": 0.00026935,
+    "isMicrostate": false
+  },
+  {
+    "id": "JP",
+    "name": "Japan",
+    "flag": "🇯🇵",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      137.883,
+      36.634
+    ],
+    "bbox": [
+      123.68,
+      24.266,
+      145.833,
+      45.51
+    ],
+    "frameBbox": [
+      130.889,
+      33.487,
+      141.993,
+      41.506
+    ],
+    "areaSr": 0.009118,
+    "isMicrostate": false
+  },
+  {
+    "id": "JE",
+    "name": "Jersey",
+    "flag": "🇯🇪",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "centroid": [
+      -2.127,
+      49.218
+    ],
+    "bbox": [
+      -2.236,
+      49.17,
+      -2.01,
+      49.266
+    ],
+    "frameBbox": [
+      -2.236,
+      49.17,
+      -2.01,
+      49.266
+    ],
+    "areaSr": 0.0000031124,
+    "isMicrostate": true
+  },
+  {
+    "id": "JO",
+    "name": "Jordan",
+    "flag": "🇯🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      36.758,
+      31.239
+    ],
+    "bbox": [
+      34.951,
+      29.19,
+      39.293,
+      33.372
+    ],
+    "frameBbox": [
+      34.951,
+      29.19,
+      39.293,
+      33.372
+    ],
+    "areaSr": 0.0021892,
+    "isMicrostate": false
+  },
+  {
+    "id": "KZ",
+    "name": "Kazakhstan",
+    "flag": "🇰🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      67.247,
+      48.362
+    ],
+    "bbox": [
+      46.609,
+      40.609,
+      87.323,
+      55.39
+    ],
+    "frameBbox": [
+      46.609,
+      40.609,
+      87.323,
+      55.39
+    ],
+    "areaSr": 0.066834,
+    "isMicrostate": false
+  },
+  {
+    "id": "KE",
+    "name": "Kenya",
+    "flag": "🇰🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      37.796,
+      0.6
+    ],
+    "bbox": [
+      33.9,
+      -4.692,
+      41.884,
+      5.492
+    ],
+    "frameBbox": [
+      33.9,
+      -4.692,
+      41.884,
+      5.492
+    ],
+    "areaSr": 0.014655,
+    "isMicrostate": false
+  },
+  {
+    "id": "KI",
+    "name": "Kiribati",
+    "flag": "🇰🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      -157.374,
+      1.854
+    ],
+    "bbox": [
+      169.523,
+      -11.457,
+      -151.783,
+      3.924
+    ],
+    "frameBbox": [
+      -157.579,
+      1.732,
+      -157.176,
+      2.029
+    ],
+    "areaSr": 0.000023098,
+    "isMicrostate": true
+  },
+  {
+    "id": "XK",
+    "name": "Kosovo",
+    "flag": "🇽🇰",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "centroid": [
+      20.873,
+      42.57
+    ],
+    "bbox": [
+      20.029,
+      41.854,
+      21.753,
+      43.261
+    ],
+    "frameBbox": [
+      20.029,
+      41.854,
+      21.753,
+      43.261
+    ],
+    "areaSr": 0.00026882,
+    "isMicrostate": false
+  },
+  {
+    "id": "KW",
+    "name": "Kuwait",
+    "flag": "🇰🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      47.563,
+      29.316
+    ],
+    "bbox": [
+      46.531,
+      28.533,
+      48.442,
+      30.097
+    ],
+    "frameBbox": [
+      46.531,
+      28.533,
+      48.442,
+      30.097
+    ],
+    "areaSr": 0.00042695,
+    "isMicrostate": false
+  },
+  {
+    "id": "KG",
+    "name": "Kyrgyzstan",
+    "flag": "🇰🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      74.509,
+      41.474
+    ],
+    "bbox": [
+      69.229,
+      39.208,
+      80.246,
+      43.24
+    ],
+    "frameBbox": [
+      69.229,
+      39.208,
+      80.246,
+      43.24
+    ],
+    "areaSr": 0.0048941,
+    "isMicrostate": false
+  },
+  {
+    "id": "LA",
+    "name": "Laos",
+    "flag": "🇱🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      103.775,
+      18.487
+    ],
+    "bbox": [
+      100.115,
+      13.921,
+      107.653,
+      22.495
+    ],
+    "frameBbox": [
+      100.115,
+      13.921,
+      107.653,
+      22.495
+    ],
+    "areaSr": 0.0056405,
+    "isMicrostate": false
+  },
+  {
+    "id": "LV",
+    "name": "Latvia",
+    "flag": "🇱🇻",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      24.92,
+      56.86
+    ],
+    "bbox": [
+      21.015,
+      55.668,
+      28.202,
+      58.063
+    ],
+    "frameBbox": [
+      21.015,
+      55.668,
+      28.202,
+      58.063
+    ],
+    "areaSr": 0.0015832,
+    "isMicrostate": false
+  },
+  {
+    "id": "LB",
+    "name": "Lebanon",
+    "flag": "🇱🇧",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      35.878,
+      33.922
+    ],
+    "bbox": [
+      35.109,
+      33.076,
+      36.585,
+      34.679
+    ],
+    "frameBbox": [
+      35.109,
+      33.076,
+      36.585,
+      34.679
+    ],
+    "areaSr": 0.00024666,
+    "isMicrostate": false
+  },
+  {
+    "id": "LS",
+    "name": "Lesotho",
+    "flag": "🇱🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      28.229,
+      -29.579
+    ],
+    "bbox": [
+      27.052,
+      -30.642,
+      29.391,
+      -28.582
+    ],
+    "frameBbox": [
+      27.052,
+      -30.642,
+      29.391,
+      -28.582
+    ],
+    "areaSr": 0.00073978,
+    "isMicrostate": false
+  },
+  {
+    "id": "LR",
+    "name": "Liberia",
+    "flag": "🇱🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -9.32,
+      6.452
+    ],
+    "bbox": [
+      -11.508,
+      4.351,
+      -7.4,
+      8.538
+    ],
+    "frameBbox": [
+      -11.508,
+      4.351,
+      -7.4,
+      8.538
+    ],
+    "areaSr": 0.0023568,
+    "isMicrostate": false
+  },
+  {
+    "id": "LY",
+    "name": "Libya",
+    "flag": "🇱🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      18.067,
+      27.017
+    ],
+    "bbox": [
+      9.31,
+      19.497,
+      25.15,
+      33.182
+    ],
+    "frameBbox": [
+      9.31,
+      19.497,
+      25.15,
+      33.182
+    ],
+    "areaSr": 0.040072,
+    "isMicrostate": false
+  },
+  {
+    "id": "LI",
+    "name": "Liechtenstein",
+    "flag": "🇱🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      9.536,
+      47.137
+    ],
+    "bbox": [
+      9.479,
+      47.057,
+      9.611,
+      47.271
+    ],
+    "frameBbox": [
+      9.479,
+      47.057,
+      9.611,
+      47.271
+    ],
+    "areaSr": 0.0000033991,
+    "isMicrostate": true
+  },
+  {
+    "id": "LT",
+    "name": "Lithuania",
+    "flag": "🇱🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      23.902,
+      55.324
+    ],
+    "bbox": [
+      20.9,
+      53.893,
+      26.776,
+      56.411
+    ],
+    "frameBbox": [
+      21.046,
+      53.893,
+      26.776,
+      56.411
+    ],
+    "areaSr": 0.0015896,
+    "isMicrostate": false
+  },
+  {
+    "id": "LU",
+    "name": "Luxembourg",
+    "flag": "🇱🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      6.072,
+      49.767
+    ],
+    "bbox": [
+      5.725,
+      49.445,
+      6.494,
+      50.167
+    ],
+    "frameBbox": [
+      5.725,
+      49.445,
+      6.494,
+      50.167
+    ],
+    "areaSr": 0.000064349,
+    "isMicrostate": true
+  },
+  {
+    "id": "MO",
+    "name": "Macau",
+    "flag": "🇲🇴",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "searchAliases": [
+      "Macao S.A.R"
+    ],
+    "centroid": [
+      113.509,
+      22.223
+    ],
+    "bbox": [
+      113.479,
+      22.196,
+      113.548,
+      22.246
+    ],
+    "frameBbox": [
+      113.479,
+      22.196,
+      113.548,
+      22.246
+    ],
+    "areaSr": 5.6023e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "MG",
+    "name": "Madagascar",
+    "flag": "🇲🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      46.741,
+      -19.32
+    ],
+    "bbox": [
+      43.257,
+      -25.571,
+      50.483,
+      -12.08
+    ],
+    "frameBbox": [
+      43.257,
+      -25.571,
+      50.483,
+      -12.08
+    ],
+    "areaSr": 0.014649,
+    "isMicrostate": false
+  },
+  {
+    "id": "MW",
+    "name": "Malawi",
+    "flag": "🇲🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      34.282,
+      -13.206
+    ],
+    "bbox": [
+      32.67,
+      -17.131,
+      35.893,
+      -9.395
+    ],
+    "frameBbox": [
+      32.67,
+      -17.131,
+      35.893,
+      -9.395
+    ],
+    "areaSr": 0.0029514,
+    "isMicrostate": false
+  },
+  {
+    "id": "MY",
+    "name": "Malaysia",
+    "flag": "🇲🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      114.717,
+      3.615
+    ],
+    "bbox": [
+      99.646,
+      0.862,
+      119.266,
+      7.352
+    ],
+    "frameBbox": [
+      109.539,
+      0.862,
+      119.266,
+      6.99
+    ],
+    "areaSr": 0.0080721,
+    "isMicrostate": false
+  },
+  {
+    "id": "MV",
+    "name": "Maldives",
+    "flag": "🇲🇻",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      73.411,
+      3.261
+    ],
+    "bbox": [
+      73.382,
+      3.229,
+      73.528,
+      4.248
+    ],
+    "frameBbox": [
+      73.382,
+      3.229,
+      73.443,
+      3.29
+    ],
+    "areaSr": 0.0000016362,
+    "isMicrostate": true
+  },
+  {
+    "id": "ML",
+    "name": "Mali",
+    "flag": "🇲🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -3.59,
+      17.315
+    ],
+    "bbox": [
+      -12.281,
+      10.143,
+      4.235,
+      24.996
+    ],
+    "frameBbox": [
+      -12.281,
+      10.143,
+      4.235,
+      24.996
+    ],
+    "areaSr": 0.030998,
+    "isMicrostate": false
+  },
+  {
+    "id": "MT",
+    "name": "Malta",
+    "flag": "🇲🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      14.443,
+      35.89
+    ],
+    "bbox": [
+      14.18,
+      35.82,
+      14.566,
+      36.076
+    ],
+    "frameBbox": [
+      14.351,
+      35.82,
+      14.566,
+      35.978
+    ],
+    "areaSr": 0.000006745,
+    "isMicrostate": true
+  },
+  {
+    "id": "MH",
+    "name": "Marshall Islands",
+    "flag": "🇲🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      171.186,
+      7.106
+    ],
+    "bbox": [
+      166.845,
+      5.8,
+      171.757,
+      11.169
+    ],
+    "frameBbox": [
+      171.036,
+      7.069,
+      171.394,
+      7.172
+    ],
+    "areaSr": 0.0000058499,
+    "isMicrostate": true
+  },
+  {
+    "id": "MR",
+    "name": "Mauritania",
+    "flag": "🇲🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -10.369,
+      20.221
+    ],
+    "bbox": [
+      -17.064,
+      14.745,
+      -4.823,
+      27.286
+    ],
+    "frameBbox": [
+      -17.064,
+      14.745,
+      -4.823,
+      27.286
+    ],
+    "areaSr": 0.025581,
+    "isMicrostate": false
+  },
+  {
+    "id": "MU",
+    "name": "Mauritius",
+    "flag": "🇲🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      57.571,
+      -20.278
+    ],
+    "bbox": [
+      57.318,
+      -20.513,
+      57.792,
+      -19.99
+    ],
+    "frameBbox": [
+      57.318,
+      -20.513,
+      57.792,
+      -19.99
+    ],
+    "areaSr": 0.000046299,
+    "isMicrostate": true
+  },
+  {
+    "id": "MX",
+    "name": "Mexico",
+    "flag": "🇲🇽",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -102.153,
+      23.917
+    ],
+    "bbox": [
+      -118.401,
+      14.545,
+      -86.696,
+      32.715
+    ],
+    "frameBbox": [
+      -117.128,
+      14.545,
+      -86.772,
+      32.715
+    ],
+    "areaSr": 0.048344,
+    "isMicrostate": false
+  },
+  {
+    "id": "MD",
+    "name": "Moldova",
+    "flag": "🇲🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      28.466,
+      47.187
+    ],
+    "bbox": [
+      26.619,
+      45.45,
+      30.131,
+      48.478
+    ],
+    "frameBbox": [
+      26.619,
+      45.45,
+      30.131,
+      48.478
+    ],
+    "areaSr": 0.0008159,
+    "isMicrostate": false
+  },
+  {
+    "id": "MC",
+    "name": "Monaco",
+    "flag": "🇲🇨",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      7.406,
+      43.753
+    ],
+    "bbox": [
+      7.378,
+      43.732,
+      7.439,
+      43.771
+    ],
+    "frameBbox": [
+      7.378,
+      43.732,
+      7.439,
+      43.771
+    ],
+    "areaSr": 3.0583e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "MN",
+    "name": "Mongolia",
+    "flag": "🇲🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      103.124,
+      46.956
+    ],
+    "bbox": [
+      87.743,
+      41.596,
+      119.898,
+      52.117
+    ],
+    "frameBbox": [
+      87.743,
+      41.596,
+      119.898,
+      52.117
+    ],
+    "areaSr": 0.038443,
+    "isMicrostate": false
+  },
+  {
+    "id": "ME",
+    "name": "Montenegro",
+    "flag": "🇲🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      19.239,
+      42.788
+    ],
+    "bbox": [
+      18.436,
+      41.869,
+      20.348,
+      43.542
+    ],
+    "frameBbox": [
+      18.436,
+      41.869,
+      20.348,
+      43.542
+    ],
+    "areaSr": 0.00033669,
+    "isMicrostate": false
+  },
+  {
+    "id": "MS",
+    "name": "Montserrat",
+    "flag": "🇲🇸",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -62.185,
+      16.739
+    ],
+    "bbox": [
+      -62.223,
+      16.681,
+      -62.148,
+      16.81
+    ],
+    "frameBbox": [
+      -62.223,
+      16.681,
+      -62.148,
+      16.81
+    ],
+    "areaSr": 0.0000019655,
+    "isMicrostate": true
+  },
+  {
+    "id": "MA",
+    "name": "Morocco",
+    "flag": "🇲🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -8.728,
+      29.767
+    ],
+    "bbox": [
+      -17.003,
+      21.421,
+      -1.066,
+      35.93
+    ],
+    "frameBbox": [
+      -17.003,
+      21.421,
+      -1.066,
+      35.93
+    ],
+    "areaSr": 0.014349,
+    "isMicrostate": false
+  },
+  {
+    "id": "MZ",
+    "name": "Mozambique",
+    "flag": "🇲🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      35.603,
+      -17.196
+    ],
+    "bbox": [
+      30.222,
+      -26.862,
+      40.845,
+      -10.464
+    ],
+    "frameBbox": [
+      30.222,
+      -26.862,
+      40.845,
+      -10.464
+    ],
+    "areaSr": 0.01948,
+    "isMicrostate": false
+  },
+  {
+    "id": "MM",
+    "name": "Myanmar",
+    "flag": "🇲🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      96.495,
+      21.15
+    ],
+    "bbox": [
+      92.18,
+      9.875,
+      101.147,
+      28.517
+    ],
+    "frameBbox": [
+      92.18,
+      10.035,
+      101.147,
+      28.517
+    ],
+    "areaSr": 0.016328,
+    "isMicrostate": false
+  },
+  {
+    "id": "NA",
+    "name": "Namibia",
+    "flag": "🇳🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      17.195,
+      -22.07
+    ],
+    "bbox": [
+      11.722,
+      -28.939,
+      25.259,
+      -16.968
+    ],
+    "frameBbox": [
+      11.722,
+      -28.939,
+      25.259,
+      -16.968
+    ],
+    "areaSr": 0.020317,
+    "isMicrostate": false
+  },
+  {
+    "id": "NR",
+    "name": "Nauru",
+    "flag": "🇳🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      166.933,
+      -0.519
+    ],
+    "bbox": [
+      166.907,
+      -0.551,
+      166.958,
+      -0.489
+    ],
+    "frameBbox": [
+      166.907,
+      -0.551,
+      166.958,
+      -0.489
+    ],
+    "areaSr": 6.8478e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "NP",
+    "name": "Nepal",
+    "flag": "🇳🇵",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      83.947,
+      28.258
+    ],
+    "bbox": [
+      80.052,
+      26.36,
+      88.162,
+      30.387
+    ],
+    "frameBbox": [
+      80.052,
+      26.36,
+      88.162,
+      30.387
+    ],
+    "areaSr": 0.0036264,
+    "isMicrostate": false
+  },
+  {
+    "id": "NL",
+    "name": "Netherlands",
+    "flag": "🇳🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      5.633,
+      52.276
+    ],
+    "bbox": [
+      -68.371,
+      12.032,
+      7.197,
+      53.625
+    ],
+    "frameBbox": [
+      3.449,
+      50.75,
+      7.197,
+      53.441
+    ],
+    "areaSr": 0.00091486,
+    "isMicrostate": false
+  },
+  {
+    "id": "NC",
+    "name": "New Caledonia",
+    "flag": "🇳🇨",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      165.481,
+      -21.325
+    ],
+    "bbox": [
+      159.928,
+      -22.661,
+      168.139,
+      -19.115
+    ],
+    "frameBbox": [
+      164.037,
+      -22.376,
+      167.004,
+      -20.142
+    ],
+    "areaSr": 0.00045988,
+    "isMicrostate": false
+  },
+  {
+    "id": "NZ",
+    "name": "New Zealand",
+    "flag": "🇳🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      170.611,
+      -43.949
+    ],
+    "bbox": [
+      165.889,
+      -52.57,
+      -171.186,
+      -8.546
+    ],
+    "frameBbox": [
+      166,
+      -47.5,
+      179,
+      -34
+    ],
+    "areaSr": 0.0065746,
+    "isMicrostate": false
+  },
+  {
+    "id": "NI",
+    "name": "Nicaragua",
+    "flag": "🇳🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -85.032,
+      12.845
+    ],
+    "bbox": [
+      -87.67,
+      10.735,
+      -83.158,
+      15.008
+    ],
+    "frameBbox": [
+      -87.67,
+      10.735,
+      -83.158,
+      15.008
+    ],
+    "areaSr": 0.0031841,
+    "isMicrostate": false
+  },
+  {
+    "id": "NE",
+    "name": "Niger",
+    "flag": "🇳🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      9.332,
+      17.412
+    ],
+    "bbox": [
+      0.164,
+      11.696,
+      15.963,
+      23.518
+    ],
+    "frameBbox": [
+      0.164,
+      11.696,
+      15.963,
+      23.518
+    ],
+    "areaSr": 0.029196,
+    "isMicrostate": false
+  },
+  {
+    "id": "NG",
+    "name": "Nigeria",
+    "flag": "🇳🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      8.08,
+      9.592
+    ],
+    "bbox": [
+      2.686,
+      4.277,
+      14.627,
+      13.873
+    ],
+    "frameBbox": [
+      2.686,
+      4.277,
+      14.627,
+      13.873
+    ],
+    "areaSr": 0.022458,
+    "isMicrostate": false
+  },
+  {
+    "id": "NU",
+    "name": "Niue",
+    "flag": "🇳🇺",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -169.87,
+      -19.049
+    ],
+    "bbox": [
+      -169.948,
+      -19.138,
+      -169.793,
+      -18.966
+    ],
+    "frameBbox": [
+      -169.948,
+      -19.138,
+      -169.793,
+      -18.966
+    ],
+    "areaSr": 0.0000048531,
+    "isMicrostate": true
+  },
+  {
+    "id": "NF",
+    "name": "Norfolk Island",
+    "flag": "🇳🇫",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      167.949,
+      -29.051
+    ],
+    "bbox": [
+      167.906,
+      -29.096,
+      167.99,
+      -29.014
+    ],
+    "frameBbox": [
+      167.906,
+      -29.096,
+      167.99,
+      -29.014
+    ],
+    "areaSr": 0.0000010136,
+    "isMicrostate": true
+  },
+  {
+    "id": "KP",
+    "name": "North Korea",
+    "flag": "🇰🇵",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      127.16,
+      40.14
+    ],
+    "bbox": [
+      124.349,
+      37.719,
+      130.687,
+      42.998
+    ],
+    "frameBbox": [
+      124.349,
+      37.719,
+      130.687,
+      42.998
+    ],
+    "areaSr": 0.0030179,
+    "isMicrostate": false
+  },
+  {
+    "id": "MK",
+    "name": "North Macedonia",
+    "flag": "🇲🇰",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      21.681,
+      41.595
+    ],
+    "bbox": [
+      20.449,
+      40.85,
+      23.006,
+      42.358
+    ],
+    "frameBbox": [
+      20.449,
+      40.85,
+      23.006,
+      42.358
+    ],
+    "areaSr": 0.00062489,
+    "isMicrostate": false
+  },
+  {
+    "id": "GB-NIR",
+    "name": "Northern Ireland",
+    "flag": "🇬🇧",
+    "kind": "constituent_country",
+    "parentId": "GB",
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "United Kingdom",
+      "UK",
+      "Britain",
+      "Ulster"
+    ],
+    "centroid": [
+      -6.704,
+      54.612
+    ],
+    "bbox": [
+      -8.145,
+      54.051,
+      -5.47,
+      55.242
+    ],
+    "frameBbox": [
+      -8.145,
+      54.051,
+      -5.47,
+      55.242
+    ],
+    "areaSr": 0.00034755,
+    "isMicrostate": false
+  },
+  {
+    "id": "MP",
+    "name": "Northern Mariana Islands",
+    "flag": "🇲🇵",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      145.744,
+      15.181
+    ],
+    "bbox": [
+      145.152,
+      14.111,
+      145.835,
+      18.807
+    ],
+    "frameBbox": [
+      145.684,
+      15.107,
+      145.822,
+      15.265
+    ],
+    "areaSr": 0.0000096948,
+    "isMicrostate": true
+  },
+  {
+    "id": "NO",
+    "name": "Norway",
+    "flag": "🇳🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      12.159,
+      63.786
+    ],
+    "bbox": [
+      -9.099,
+      58.021,
+      33.629,
+      80.478
+    ],
+    "frameBbox": [
+      4.91,
+      58.021,
+      30.961,
+      71.091
+    ],
+    "areaSr": 0.0094666,
+    "isMicrostate": false
+  },
+  {
+    "id": "OM",
+    "name": "Oman",
+    "flag": "🇴🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      56.056,
+      20.557
+    ],
+    "bbox": [
+      51.978,
+      16.648,
+      59.837,
+      26.356
+    ],
+    "frameBbox": [
+      51.978,
+      16.648,
+      59.837,
+      24.979
+    ],
+    "areaSr": 0.0076884,
+    "isMicrostate": false
+  },
+  {
+    "id": "PK",
+    "name": "Pakistan",
+    "flag": "🇵🇰",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      69.168,
+      29.884
+    ],
+    "bbox": [
+      60.843,
+      23.753,
+      77.049,
+      37.037
+    ],
+    "frameBbox": [
+      60.843,
+      23.753,
+      77.049,
+      37.037
+    ],
+    "areaSr": 0.021527,
+    "isMicrostate": false
+  },
+  {
+    "id": "PW",
+    "name": "Palau",
+    "flag": "🇵🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      134.58,
+      7.513
+    ],
+    "bbox": [
+      131.135,
+      3.022,
+      134.66,
+      7.712
+    ],
+    "frameBbox": [
+      134.506,
+      7.361,
+      134.66,
+      7.712
+    ],
+    "areaSr": 0.0000083917,
+    "isMicrostate": true
+  },
+  {
+    "id": "PS",
+    "name": "Palestine",
+    "flag": "🇵🇸",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "centroid": [
+      35.248,
+      31.947
+    ],
+    "bbox": [
+      34.198,
+      31.208,
+      35.572,
+      32.534
+    ],
+    "frameBbox": [
+      34.873,
+      31.351,
+      35.572,
+      32.534
+    ],
+    "areaSr": 0.00015603,
+    "isMicrostate": true
+  },
+  {
+    "id": "PA",
+    "name": "Panama",
+    "flag": "🇵🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -80.111,
+      8.527
+    ],
+    "bbox": [
+      -83.027,
+      7.22,
+      -77.196,
+      9.598
+    ],
+    "frameBbox": [
+      -83.027,
+      7.22,
+      -77.196,
+      9.598
+    ],
+    "areaSr": 0.0018292,
+    "isMicrostate": false
+  },
+  {
+    "id": "PG",
+    "name": "Papua New Guinea",
+    "flag": "🇵🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      144.234,
+      -6.605
+    ],
+    "bbox": [
+      140.862,
+      -11.631,
+      155.958,
+      -1.353
+    ],
+    "frameBbox": [
+      140.862,
+      -10.655,
+      150.85,
+      -2.61
+    ],
+    "areaSr": 0.011439,
+    "isMicrostate": false
+  },
+  {
+    "id": "PY",
+    "name": "Paraguay",
+    "flag": "🇵🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -58.443,
+      -23.209
+    ],
+    "bbox": [
+      -62.651,
+      -27.554,
+      -54.242,
+      -19.286
+    ],
+    "frameBbox": [
+      -62.651,
+      -27.554,
+      -54.242,
+      -19.286
+    ],
+    "areaSr": 0.009877,
+    "isMicrostate": false
+  },
+  {
+    "id": "CN",
+    "name": "People's Republic of China",
+    "flag": "🇨🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "searchAliases": [
+      "China"
+    ],
+    "centroid": [
+      103.346,
+      36.757
+    ],
+    "bbox": [
+      73.607,
+      18.218,
+      134.752,
+      53.556
+    ],
+    "frameBbox": [
+      73.607,
+      20.264,
+      134.752,
+      53.556
+    ],
+    "areaSr": 0.23088,
+    "isMicrostate": false
+  },
+  {
+    "id": "PE",
+    "name": "Peru",
+    "flag": "🇵🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -74.421,
+      -9.107
+    ],
+    "bbox": [
+      -81.337,
+      -18.346,
+      -68.685,
+      -0.042
+    ],
+    "frameBbox": [
+      -81.337,
+      -18.346,
+      -68.685,
+      -0.042
+    ],
+    "areaSr": 0.031936,
+    "isMicrostate": false
+  },
+  {
+    "id": "PH",
+    "name": "Philippines",
+    "flag": "🇵🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      121.42,
+      15.947
+    ],
+    "bbox": [
+      116.97,
+      5.06,
+      126.593,
+      20.841
+    ],
+    "frameBbox": [
+      119.762,
+      12.567,
+      124.143,
+      18.615
+    ],
+    "areaSr": 0.0071522,
+    "isMicrostate": false
+  },
+  {
+    "id": "PN",
+    "name": "Pitcairn Islands",
+    "flag": "🇵🇳",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -128.317,
+      -24.365
+    ],
+    "bbox": [
+      -128.35,
+      -24.413,
+      -128.29,
+      -24.323
+    ],
+    "frameBbox": [
+      -128.35,
+      -24.413,
+      -128.29,
+      -24.323
+    ],
+    "areaSr": 9.5285e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "PL",
+    "name": "Poland",
+    "flag": "🇵🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      19.42,
+      52.112
+    ],
+    "bbox": [
+      14.129,
+      49.021,
+      24.106,
+      54.838
+    ],
+    "frameBbox": [
+      14.129,
+      49.021,
+      24.106,
+      54.838
+    ],
+    "areaSr": 0.0077003,
+    "isMicrostate": false
+  },
+  {
+    "id": "PT",
+    "name": "Portugal",
+    "flag": "🇵🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      -7.985,
+      39.652
+    ],
+    "bbox": [
+      -31.283,
+      32.648,
+      -6.213,
+      42.137
+    ],
+    "frameBbox": [
+      -9.48,
+      37.005,
+      -6.213,
+      42.137
+    ],
+    "areaSr": 0.002236,
+    "isMicrostate": false
+  },
+  {
+    "id": "PR",
+    "name": "Puerto Rico",
+    "flag": "🇵🇷",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -66.482,
+      18.231
+    ],
+    "bbox": [
+      -67.937,
+      17.947,
+      -65.295,
+      18.522
+    ],
+    "frameBbox": [
+      -67.264,
+      17.947,
+      -65.621,
+      18.522
+    ],
+    "areaSr": 0.00022037,
+    "isMicrostate": false
+  },
+  {
+    "id": "QA",
+    "name": "Qatar",
+    "flag": "🇶🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      51.185,
+      25.305
+    ],
+    "bbox": [
+      50.755,
+      24.565,
+      51.609,
+      26.153
+    ],
+    "frameBbox": [
+      50.755,
+      24.565,
+      51.609,
+      26.153
+    ],
+    "areaSr": 0.00027283,
+    "isMicrostate": false
+  },
+  {
+    "id": "CG",
+    "name": "Republic of the Congo",
+    "flag": "🇨🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      15.221,
+      -0.837
+    ],
+    "bbox": [
+      11.13,
+      -5.004,
+      18.622,
+      3.687
+    ],
+    "frameBbox": [
+      11.13,
+      -5.004,
+      18.622,
+      3.687
+    ],
+    "areaSr": 0.0085459,
+    "isMicrostate": false
+  },
+  {
+    "id": "RO",
+    "name": "Romania",
+    "flag": "🇷🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      24.983,
+      45.848
+    ],
+    "bbox": [
+      20.242,
+      43.671,
+      29.706,
+      48.263
+    ],
+    "frameBbox": [
+      20.242,
+      43.671,
+      29.706,
+      48.263
+    ],
+    "areaSr": 0.0058086,
+    "isMicrostate": false
+  },
+  {
+    "id": "RU",
+    "name": "Russia",
+    "flag": "🇷🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      95.14,
+      65.743
+    ],
+    "bbox": [
+      19.604,
+      41.199,
+      -169.729,
+      81.854
+    ],
+    "frameBbox": [
+      26,
+      41,
+      179,
+      77
+    ],
+    "areaSr": 0.41586,
+    "isMicrostate": false
+  },
+  {
+    "id": "RW",
+    "name": "Rwanda",
+    "flag": "🇷🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      29.92,
+      -1.99
+    ],
+    "bbox": [
+      28.858,
+      -2.809,
+      30.877,
+      -1.063
+    ],
+    "frameBbox": [
+      28.858,
+      -2.809,
+      30.877,
+      -1.063
+    ],
+    "areaSr": 0.00062542,
+    "isMicrostate": false
+  },
+  {
+    "id": "BL",
+    "name": "Saint Barthélemy",
+    "flag": "🇧🇱",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "searchAliases": [
+      "Saint Barthelemy"
+    ],
+    "centroid": [
+      -62.841,
+      17.899
+    ],
+    "bbox": [
+      -62.875,
+      17.875,
+      -62.8,
+      17.922
+    ],
+    "frameBbox": [
+      -62.875,
+      17.875,
+      -62.8,
+      17.922
+    ],
+    "areaSr": 6.0421e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "SH",
+    "name": "Saint Helena",
+    "flag": "🇸🇭",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": false,
+    "centroid": [
+      -5.716,
+      -15.959
+    ],
+    "bbox": [
+      -14.415,
+      -16.004,
+      -5.66,
+      -7.883
+    ],
+    "frameBbox": [
+      -5.783,
+      -16.004,
+      -5.66,
+      -15.906
+    ],
+    "areaSr": 0.0000045784,
+    "isMicrostate": true
+  },
+  {
+    "id": "KN",
+    "name": "Saint Kitts and Nevis",
+    "flag": "🇰🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -62.748,
+      17.327
+    ],
+    "bbox": [
+      -62.84,
+      17.101,
+      -62.532,
+      17.403
+    ],
+    "frameBbox": [
+      -62.84,
+      17.224,
+      -62.631,
+      17.403
+    ],
+    "areaSr": 0.0000057389,
+    "isMicrostate": true
+  },
+  {
+    "id": "LC",
+    "name": "Saint Lucia",
+    "flag": "🇱🇨",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -60.97,
+      13.895
+    ],
+    "bbox": [
+      -61.073,
+      13.718,
+      -60.887,
+      14.093
+    ],
+    "frameBbox": [
+      -61.073,
+      13.718,
+      -60.887,
+      14.093
+    ],
+    "areaSr": 0.000013582,
+    "isMicrostate": true
+  },
+  {
+    "id": "MF",
+    "name": "Saint Martin",
+    "flag": "🇲🇫",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -63.06,
+      18.089
+    ],
+    "bbox": [
+      -63.123,
+      18.069,
+      -63.009,
+      18.115
+    ],
+    "frameBbox": [
+      -63.123,
+      18.069,
+      -63.009,
+      18.115
+    ],
+    "areaSr": 0.0000012073,
+    "isMicrostate": true
+  },
+  {
+    "id": "PM",
+    "name": "Saint Pierre and Miquelon",
+    "flag": "🇵🇲",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -56.327,
+      46.946
+    ],
+    "bbox": [
+      -56.387,
+      46.753,
+      -56.137,
+      47.099
+    ],
+    "frameBbox": [
+      -56.387,
+      46.795,
+      -56.255,
+      47.099
+    ],
+    "areaSr": 0.0000050565,
+    "isMicrostate": true
+  },
+  {
+    "id": "VC",
+    "name": "Saint Vincent and the Grenadines",
+    "flag": "🇻🇨",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -61.196,
+      13.254
+    ],
+    "bbox": [
+      -61.354,
+      12.695,
+      -61.124,
+      13.359
+    ],
+    "frameBbox": [
+      -61.277,
+      13.142,
+      -61.124,
+      13.359
+    ],
+    "areaSr": 0.0000076642,
+    "isMicrostate": true
+  },
+  {
+    "id": "WS",
+    "name": "Samoa",
+    "flag": "🇼🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      -172.437,
+      -13.631
+    ],
+    "bbox": [
+      -172.779,
+      -14.047,
+      -171.45,
+      -13.465
+    ],
+    "frameBbox": [
+      -172.779,
+      -13.804,
+      -172.177,
+      -13.465
+    ],
+    "areaSr": 0.000066562,
+    "isMicrostate": true
+  },
+  {
+    "id": "SM",
+    "name": "San Marino",
+    "flag": "🇸🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      12.459,
+      43.942
+    ],
+    "bbox": [
+      12.397,
+      43.894,
+      12.515,
+      43.99
+    ],
+    "frameBbox": [
+      12.397,
+      43.894,
+      12.515,
+      43.99
+    ],
+    "areaSr": 0.0000016817,
+    "isMicrostate": true
+  },
+  {
+    "id": "ST",
+    "name": "São Tomé and Príncipe",
+    "flag": "🇸🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "searchAliases": [
+      "São Tomé and Principe"
+    ],
+    "centroid": [
+      6.607,
+      0.238
+    ],
+    "bbox": [
+      6.468,
+      0.047,
+      7.452,
+      1.699
+    ],
+    "frameBbox": [
+      6.468,
+      0.047,
+      6.75,
+      0.404
+    ],
+    "areaSr": 0.000024288,
+    "isMicrostate": true
+  },
+  {
+    "id": "SA",
+    "name": "Saudi Arabia",
+    "flag": "🇸🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      44.665,
+      24.089
+    ],
+    "bbox": [
+      34.616,
+      16.372,
+      55.641,
+      32.125
+    ],
+    "frameBbox": [
+      34.616,
+      16.372,
+      55.641,
+      32.125
+    ],
+    "areaSr": 0.047447,
+    "isMicrostate": false
+  },
+  {
+    "id": "GB-SCT",
+    "name": "Scotland",
+    "flag": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "kind": "constituent_country",
+    "parentId": "GB",
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "United Kingdom",
+      "UK",
+      "Britain",
+      "Great Britain"
+    ],
+    "centroid": [
+      -3.993,
+      56.663
+    ],
+    "bbox": [
+      -7.543,
+      54.689,
+      -0.774,
+      60.832
+    ],
+    "frameBbox": [
+      -6.134,
+      54.689,
+      -1.778,
+      58.65
+    ],
+    "areaSr": 0.0018643,
+    "isMicrostate": false
+  },
+  {
+    "id": "SN",
+    "name": "Senegal",
+    "flag": "🇸🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -14.469,
+      14.365
+    ],
+    "bbox": [
+      -17.536,
+      12.328,
+      -11.382,
+      16.679
+    ],
+    "frameBbox": [
+      -17.536,
+      12.328,
+      -11.382,
+      16.679
+    ],
+    "areaSr": 0.0048615,
+    "isMicrostate": false
+  },
+  {
+    "id": "RS",
+    "name": "Serbia",
+    "flag": "🇷🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "Republic of Serbia"
+    ],
+    "centroid": [
+      20.807,
+      44.211
+    ],
+    "bbox": [
+      18.839,
+      42.242,
+      22.977,
+      46.169
+    ],
+    "frameBbox": [
+      18.839,
+      42.242,
+      22.977,
+      46.169
+    ],
+    "areaSr": 0.0019091,
+    "isMicrostate": false
+  },
+  {
+    "id": "SC",
+    "name": "Seychelles",
+    "flag": "🇸🇨",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      55.476,
+      -4.661
+    ],
+    "bbox": [
+      55.383,
+      -4.786,
+      55.543,
+      -4.559
+    ],
+    "frameBbox": [
+      55.383,
+      -4.786,
+      55.543,
+      -4.559
+    ],
+    "areaSr": 0.0000042965,
+    "isMicrostate": true
+  },
+  {
+    "id": "XC",
+    "name": "Siachen Glacier",
+    "flag": "🇽🇨",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "centroid": [
+      77.18,
+      35.392
+    ],
+    "bbox": [
+      76.767,
+      35.11,
+      77.799,
+      35.662
+    ],
+    "frameBbox": [
+      76.767,
+      35.11,
+      77.799,
+      35.662
+    ],
+    "areaSr": 0.000052183,
+    "isMicrostate": true
+  },
+  {
+    "id": "SL",
+    "name": "Sierra Leone",
+    "flag": "🇸🇱",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      -11.785,
+      8.571
+    ],
+    "bbox": [
+      -13.293,
+      6.907,
+      -10.283,
+      9.997
+    ],
+    "frameBbox": [
+      -13.293,
+      6.907,
+      -10.283,
+      9.997
+    ],
+    "areaSr": 0.0017708,
+    "isMicrostate": false
+  },
+  {
+    "id": "SG",
+    "name": "Singapore",
+    "flag": "🇸🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      103.817,
+      1.359
+    ],
+    "bbox": [
+      103.65,
+      1.265,
+      103.996,
+      1.447
+    ],
+    "frameBbox": [
+      103.65,
+      1.265,
+      103.996,
+      1.447
+    ],
+    "areaSr": 0.000011947,
+    "isMicrostate": true
+  },
+  {
+    "id": "SX",
+    "name": "Sint Maarten",
+    "flag": "🇸🇽",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -63.057,
+      18.051
+    ],
+    "bbox": [
+      -63.125,
+      18.019,
+      -63.011,
+      18.069
+    ],
+    "frameBbox": [
+      -63.125,
+      18.019,
+      -63.011,
+      18.069
+    ],
+    "areaSr": 0.0000010308,
+    "isMicrostate": true
+  },
+  {
+    "id": "SK",
+    "name": "Slovakia",
+    "flag": "🇸🇰",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      19.469,
+      48.711
+    ],
+    "bbox": [
+      16.863,
+      47.763,
+      22.539,
+      49.598
+    ],
+    "frameBbox": [
+      16.863,
+      47.763,
+      22.539,
+      49.598
+    ],
+    "areaSr": 0.0011909,
+    "isMicrostate": false
+  },
+  {
+    "id": "SI",
+    "name": "Slovenia",
+    "flag": "🇸🇮",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      14.801,
+      46.116
+    ],
+    "bbox": [
+      13.378,
+      45.428,
+      16.516,
+      46.863
+    ],
+    "frameBbox": [
+      13.378,
+      45.428,
+      16.516,
+      46.863
+    ],
+    "areaSr": 0.00049752,
+    "isMicrostate": false
+  },
+  {
+    "id": "SB",
+    "name": "Solomon Islands",
+    "flag": "🇸🇧",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      160.169,
+      -9.625
+    ],
+    "bbox": [
+      155.678,
+      -11.832,
+      166.929,
+      -6.609
+    ],
+    "frameBbox": [
+      159.607,
+      -9.929,
+      160.819,
+      -9.269
+    ],
+    "areaSr": 0.00063414,
+    "isMicrostate": false
+  },
+  {
+    "id": "SO",
+    "name": "Somalia",
+    "flag": "🇸🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      45.679,
+      4.739
+    ],
+    "bbox": [
+      40.964,
+      -1.695,
+      51.39,
+      11.984
+    ],
+    "frameBbox": [
+      40.964,
+      -1.695,
+      51.39,
+      11.984
+    ],
+    "areaSr": 0.011668,
+    "isMicrostate": false
+  },
+  {
+    "id": "XS",
+    "name": "Somaliland",
+    "flag": "🇽🇸",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": false,
+    "centroid": [
+      46.253,
+      9.736
+    ],
+    "bbox": [
+      42.656,
+      7.997,
+      48.939,
+      11.5
+    ],
+    "frameBbox": [
+      42.656,
+      7.997,
+      48.939,
+      11.5
+    ],
+    "areaSr": 0.0041511,
+    "isMicrostate": false
+  },
+  {
+    "id": "ZA",
+    "name": "South Africa",
+    "flag": "🇿🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      25.192,
+      -28.971
+    ],
+    "bbox": [
+      16.448,
+      -46.963,
+      37.888,
+      -22.146
+    ],
+    "frameBbox": [
+      16.448,
+      -34.786,
+      32.886,
+      -22.146
+    ],
+    "areaSr": 0.030098,
+    "isMicrostate": false
+  },
+  {
+    "id": "GS",
+    "name": "South Georgia and the South Sandwich Islands",
+    "flag": "🇬🇸",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": false,
+    "searchAliases": [
+      "South Georgia and the Islands"
+    ],
+    "centroid": [
+      -36.694,
+      -54.364
+    ],
+    "bbox": [
+      -38.017,
+      -58.492,
+      -26.26,
+      -53.984
+    ],
+    "frameBbox": [
+      -38.017,
+      -54.867,
+      -35.799,
+      -53.984
+    ],
+    "areaSr": 0.000090381,
+    "isMicrostate": true
+  },
+  {
+    "id": "KR",
+    "name": "South Korea",
+    "flag": "🇰🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      127.868,
+      36.451
+    ],
+    "bbox": [
+      126.008,
+      33.202,
+      130.934,
+      38.623
+    ],
+    "frameBbox": [
+      126.161,
+      34.314,
+      129.573,
+      38.623
+    ],
+    "areaSr": 0.0023936,
+    "isMicrostate": false
+  },
+  {
+    "id": "SS",
+    "name": "South Sudan",
+    "flag": "🇸🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      30.251,
+      7.309
+    ],
+    "bbox": [
+      24.147,
+      3.491,
+      35.268,
+      12.223
+    ],
+    "frameBbox": [
+      24.147,
+      3.491,
+      35.268,
+      12.223
+    ],
+    "areaSr": 0.015373,
+    "isMicrostate": false
+  },
+  {
+    "id": "ES",
+    "name": "Spain",
+    "flag": "🇪🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      -3.573,
+      40.372
+    ],
+    "bbox": [
+      -18.161,
+      27.646,
+      4.322,
+      43.765
+    ],
+    "frameBbox": [
+      -9.236,
+      36.026,
+      3.307,
+      43.765
+    ],
+    "areaSr": 0.01247,
+    "isMicrostate": false
+  },
+  {
+    "id": "LK",
+    "name": "Sri Lanka",
+    "flag": "🇱🇰",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      80.704,
+      7.607
+    ],
+    "bbox": [
+      79.708,
+      5.949,
+      81.877,
+      9.813
+    ],
+    "frameBbox": [
+      79.708,
+      5.949,
+      81.877,
+      9.813
+    ],
+    "areaSr": 0.0016271,
+    "isMicrostate": false
+  },
+  {
+    "id": "SD",
+    "name": "Sudan",
+    "flag": "🇸🇩",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      29.907,
+      15.968
+    ],
+    "bbox": [
+      21.825,
+      8.666,
+      38.609,
+      22.202
+    ],
+    "frameBbox": [
+      21.825,
+      8.666,
+      38.609,
+      22.202
+    ],
+    "areaSr": 0.0459,
+    "isMicrostate": false
+  },
+  {
+    "id": "SR",
+    "name": "Suriname",
+    "flag": "🇸🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -55.912,
+      4.13
+    ],
+    "bbox": [
+      -58.054,
+      1.842,
+      -53.99,
+      5.993
+    ],
+    "frameBbox": [
+      -58.054,
+      1.842,
+      -53.99,
+      5.993
+    ],
+    "areaSr": 0.0035865,
+    "isMicrostate": false
+  },
+  {
+    "id": "SE",
+    "name": "Sweden",
+    "flag": "🇸🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      16.247,
+      62.434
+    ],
+    "bbox": [
+      11.147,
+      55.346,
+      24.155,
+      69.037
+    ],
+    "frameBbox": [
+      11.147,
+      55.346,
+      24.155,
+      69.037
+    ],
+    "areaSr": 0.010913,
+    "isMicrostate": false
+  },
+  {
+    "id": "CH",
+    "name": "Switzerland",
+    "flag": "🇨🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      8.206,
+      46.799
+    ],
+    "bbox": [
+      5.97,
+      45.83,
+      10.455,
+      47.776
+    ],
+    "frameBbox": [
+      5.97,
+      45.83,
+      10.455,
+      47.776
+    ],
+    "areaSr": 0.0010152,
+    "isMicrostate": false
+  },
+  {
+    "id": "SY",
+    "name": "Syria",
+    "flag": "🇸🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      38.484,
+      35.017
+    ],
+    "bbox": [
+      35.764,
+      32.317,
+      42.359,
+      37.297
+    ],
+    "frameBbox": [
+      35.764,
+      32.317,
+      42.359,
+      37.297
+    ],
+    "areaSr": 0.0045817,
+    "isMicrostate": false
+  },
+  {
+    "id": "TW",
+    "name": "Taiwan",
+    "flag": "🇹🇼",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "centroid": [
+      120.959,
+      23.748
+    ],
+    "bbox": [
+      118.287,
+      21.925,
+      121.929,
+      25.277
+    ],
+    "frameBbox": [
+      120.072,
+      21.925,
+      121.929,
+      25.277
+    ],
+    "areaSr": 0.00088688,
+    "isMicrostate": false
+  },
+  {
+    "id": "TJ",
+    "name": "Tajikistan",
+    "flag": "🇹🇯",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      71.027,
+      38.535
+    ],
+    "bbox": [
+      67.35,
+      36.684,
+      75.119,
+      41.035
+    ],
+    "frameBbox": [
+      67.35,
+      36.684,
+      75.119,
+      41.035
+    ],
+    "areaSr": 0.0035056,
+    "isMicrostate": false
+  },
+  {
+    "id": "TZ",
+    "name": "Tanzania",
+    "flag": "🇹🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "searchAliases": [
+      "United Republic of Tanzania"
+    ],
+    "centroid": [
+      34.787,
+      -6.269
+    ],
+    "bbox": [
+      29.323,
+      -11.716,
+      40.464,
+      -0.995
+    ],
+    "frameBbox": [
+      29.323,
+      -11.716,
+      40.464,
+      -0.995
+    ],
+    "areaSr": 0.023301,
+    "isMicrostate": false
+  },
+  {
+    "id": "TH",
+    "name": "Thailand",
+    "flag": "🇹🇭",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      101.004,
+      15.099
+    ],
+    "bbox": [
+      97.374,
+      5.637,
+      105.641,
+      20.424
+    ],
+    "frameBbox": [
+      97.374,
+      5.637,
+      105.641,
+      20.424
+    ],
+    "areaSr": 0.012706,
+    "isMicrostate": false
+  },
+  {
+    "id": "BS",
+    "name": "The Bahamas",
+    "flag": "🇧🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -78.038,
+      24.701
+    ],
+    "bbox": [
+      -78.986,
+      20.937,
+      -72.747,
+      26.94
+    ],
+    "frameBbox": [
+      -78.435,
+      24.287,
+      -77.735,
+      25.202
+    ],
+    "areaSr": 0.00031208,
+    "isMicrostate": false
+  },
+  {
+    "id": "GM",
+    "name": "The Gambia",
+    "flag": "🇬🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "searchAliases": [
+      "Gambia"
+    ],
+    "centroid": [
+      -15.396,
+      13.451
+    ],
+    "bbox": [
+      -16.825,
+      13.064,
+      -13.827,
+      13.812
+    ],
+    "frameBbox": [
+      -16.825,
+      13.064,
+      -13.827,
+      13.812
+    ],
+    "areaSr": 0.00025409,
+    "isMicrostate": false
+  },
+  {
+    "id": "TG",
+    "name": "Togo",
+    "flag": "🇹🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      0.964,
+      8.521
+    ],
+    "bbox": [
+      -0.09,
+      6.089,
+      1.778,
+      11.116
+    ],
+    "frameBbox": [
+      -0.09,
+      6.089,
+      1.778,
+      11.116
+    ],
+    "areaSr": 0.0014077,
+    "isMicrostate": false
+  },
+  {
+    "id": "TO",
+    "name": "Tonga",
+    "flag": "🇹🇴",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      -175.217,
+      -21.167
+    ],
+    "bbox": [
+      -175.362,
+      -21.451,
+      -173.922,
+      -18.565
+    ],
+    "frameBbox": [
+      -175.362,
+      -21.264,
+      -175.078,
+      -21.068
+    ],
+    "areaSr": 0.000010632,
+    "isMicrostate": true
+  },
+  {
+    "id": "TT",
+    "name": "Trinidad and Tobago",
+    "flag": "🇹🇹",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -61.293,
+      10.421
+    ],
+    "bbox": [
+      -61.906,
+      10.065,
+      -60.525,
+      11.325
+    ],
+    "frameBbox": [
+      -61.906,
+      10.065,
+      -60.918,
+      10.84
+    ],
+    "areaSr": 0.00012571,
+    "isMicrostate": true
+  },
+  {
+    "id": "TN",
+    "name": "Tunisia",
+    "flag": "🇹🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      9.551,
+      34.089
+    ],
+    "bbox": [
+      7.496,
+      30.229,
+      11.536,
+      37.34
+    ],
+    "frameBbox": [
+      7.496,
+      30.229,
+      11.536,
+      37.34
+    ],
+    "areaSr": 0.0038596,
+    "isMicrostate": false
+  },
+  {
+    "id": "TR",
+    "name": "Turkey",
+    "flag": "🇹🇷",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      35.41,
+      39.062
+    ],
+    "bbox": [
+      25.669,
+      35.831,
+      44.817,
+      42.093
+    ],
+    "frameBbox": [
+      26.096,
+      35.831,
+      44.817,
+      42.063
+    ],
+    "areaSr": 0.019212,
+    "isMicrostate": false
+  },
+  {
+    "id": "XN",
+    "name": "Turkish Republic of Northern Cyprus",
+    "flag": "🇽🇳",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": false,
+    "searchAliases": [
+      "Northern Cyprus"
+    ],
+    "centroid": [
+      33.568,
+      35.263
+    ],
+    "bbox": [
+      32.713,
+      35,
+      34.556,
+      35.662
+    ],
+    "frameBbox": [
+      32.713,
+      35,
+      34.556,
+      35.662
+    ],
+    "areaSr": 0.000085502,
+    "isMicrostate": true
+  },
+  {
+    "id": "TM",
+    "name": "Turkmenistan",
+    "flag": "🇹🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      59.448,
+      39.125
+    ],
+    "bbox": [
+      52.494,
+      35.171,
+      66.629,
+      42.778
+    ],
+    "frameBbox": [
+      52.494,
+      35.171,
+      66.629,
+      42.778
+    ],
+    "areaSr": 0.011595,
+    "isMicrostate": false
+  },
+  {
+    "id": "TC",
+    "name": "Turks and Caicos Islands",
+    "flag": "🇹🇨",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -71.741,
+      21.812
+    ],
+    "bbox": [
+      -72.342,
+      21.752,
+      -71.637,
+      21.952
+    ],
+    "frameBbox": [
+      -71.848,
+      21.752,
+      -71.637,
+      21.852
+    ],
+    "areaSr": 0.000008136,
+    "isMicrostate": true
+  },
+  {
+    "id": "TV",
+    "name": "Tuvalu",
+    "flag": "🇹🇻",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      179.206,
+      -8.503
+    ],
+    "bbox": [
+      179.196,
+      -8.535,
+      179.217,
+      -8.466
+    ],
+    "frameBbox": [
+      179.196,
+      -8.535,
+      179.217,
+      -8.466
+    ],
+    "areaSr": 2.5255e-7,
+    "isMicrostate": true
+  },
+  {
+    "id": "UG",
+    "name": "Uganda",
+    "flag": "🇺🇬",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      32.369,
+      1.274
+    ],
+    "bbox": [
+      29.562,
+      -1.47,
+      34.978,
+      4.22
+    ],
+    "frameBbox": [
+      29.562,
+      -1.47,
+      34.978,
+      4.22
+    ],
+    "areaSr": 0.0059758,
+    "isMicrostate": false
+  },
+  {
+    "id": "UA",
+    "name": "Ukraine",
+    "flag": "🇺🇦",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": true,
+    "centroid": [
+      31.315,
+      49.197
+    ],
+    "bbox": [
+      22.132,
+      45.234,
+      40.128,
+      52.354
+    ],
+    "frameBbox": [
+      22.132,
+      45.234,
+      40.128,
+      52.354
+    ],
+    "areaSr": 0.014047,
+    "isMicrostate": false
+  },
+  {
+    "id": "AE",
+    "name": "United Arab Emirates",
+    "flag": "🇦🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      54.298,
+      23.902
+    ],
+    "bbox": [
+      51.568,
+      22.621,
+      56.388,
+      26.068
+    ],
+    "frameBbox": [
+      51.568,
+      22.621,
+      56.388,
+      26.068
+    ],
+    "areaSr": 0.0017561,
+    "isMicrostate": false
+  },
+  {
+    "id": "US",
+    "name": "United States of America",
+    "flag": "🇺🇸",
+    "kind": "country",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": true,
+    "centroid": [
+      -98.821,
+      39.887
+    ],
+    "bbox": [
+      172.495,
+      18.964,
+      -66.987,
+      71.408
+    ],
+    "frameBbox": [
+      -125,
+      24,
+      -66,
+      50
+    ],
+    "areaSr": 0.23256,
+    "isMicrostate": false
+  },
+  {
+    "id": "VI",
+    "name": "United States Virgin Islands",
+    "flag": "🇻🇮",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "North America",
+    "isUnMember": false,
+    "centroid": [
+      -64.772,
+      17.741
+    ],
+    "bbox": [
+      -65.024,
+      17.702,
+      -64.58,
+      18.385
+    ],
+    "frameBbox": [
+      -64.889,
+      17.702,
+      -64.58,
+      17.794
+    ],
+    "areaSr": 0.0000077799,
+    "isMicrostate": true
+  },
+  {
+    "id": "UY",
+    "name": "Uruguay",
+    "flag": "🇺🇾",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -56.025,
+      -32.791
+    ],
+    "bbox": [
+      -58.438,
+      -34.933,
+      -53.126,
+      -30.101
+    ],
+    "frameBbox": [
+      -58.438,
+      -34.933,
+      -53.126,
+      -30.101
+    ],
+    "areaSr": 0.0043746,
+    "isMicrostate": false
+  },
+  {
+    "id": "UZ",
+    "name": "Uzbekistan",
+    "flag": "🇺🇿",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      63.295,
+      41.777
+    ],
+    "bbox": [
+      55.976,
+      37.172,
+      73.137,
+      45.555
+    ],
+    "frameBbox": [
+      55.976,
+      37.172,
+      73.137,
+      45.555
+    ],
+    "areaSr": 0.011022,
+    "isMicrostate": false
+  },
+  {
+    "id": "VU",
+    "name": "Vanuatu",
+    "flag": "🇻🇺",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": true,
+    "centroid": [
+      166.85,
+      -15.225
+    ],
+    "bbox": [
+      166.526,
+      -20.242,
+      169.896,
+      -13.709
+    ],
+    "frameBbox": [
+      166.526,
+      -15.635,
+      167.201,
+      -14.637
+    ],
+    "areaSr": 0.0002782,
+    "isMicrostate": false
+  },
+  {
+    "id": "VA",
+    "name": "Vatican City",
+    "flag": "🇻🇦",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Europe",
+    "isUnMember": false,
+    "searchAliases": [
+      "Vatican"
+    ],
+    "centroid": [
+      12.434,
+      41.902
+    ],
+    "bbox": [
+      12.428,
+      41.898,
+      12.439,
+      41.906
+    ],
+    "frameBbox": [
+      12.428,
+      41.898,
+      12.439,
+      41.906
+    ],
+    "areaSr": 1.7404e-8,
+    "isMicrostate": true
+  },
+  {
+    "id": "VE",
+    "name": "Venezuela",
+    "flag": "🇻🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "South America",
+    "isUnMember": true,
+    "centroid": [
+      -66.176,
+      7.117
+    ],
+    "bbox": [
+      -73.366,
+      0.688,
+      -59.829,
+      12.178
+    ],
+    "frameBbox": [
+      -73.366,
+      0.688,
+      -59.829,
+      12.178
+    ],
+    "areaSr": 0.022526,
+    "isMicrostate": false
+  },
+  {
+    "id": "VN",
+    "name": "Vietnam",
+    "flag": "🇻🇳",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      106.349,
+      16.55
+    ],
+    "bbox": [
+      102.127,
+      8.583,
+      109.445,
+      23.345
+    ],
+    "frameBbox": [
+      102.127,
+      8.583,
+      109.445,
+      23.345
+    ],
+    "areaSr": 0.008104,
+    "isMicrostate": false
+  },
+  {
+    "id": "GB-WLS",
+    "name": "Wales",
+    "flag": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+    "kind": "constituent_country",
+    "parentId": "GB",
+    "continent": "Europe",
+    "isUnMember": true,
+    "searchAliases": [
+      "United Kingdom",
+      "UK",
+      "Britain",
+      "Great Britain",
+      "Cymru"
+    ],
+    "centroid": [
+      -3.734,
+      52.3
+    ],
+    "bbox": [
+      -5.262,
+      51.39,
+      -2.662,
+      53.419
+    ],
+    "frameBbox": [
+      -5.262,
+      51.39,
+      -2.662,
+      53.347
+    ],
+    "areaSr": 0.00050527,
+    "isMicrostate": false
+  },
+  {
+    "id": "WF",
+    "name": "Wallis and Futuna",
+    "flag": "🇼🇫",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Oceania",
+    "isUnMember": false,
+    "centroid": [
+      -178.13,
+      -14.286
+    ],
+    "bbox": [
+      -178.194,
+      -14.325,
+      -176.128,
+      -13.222
+    ],
+    "frameBbox": [
+      -178.194,
+      -14.325,
+      -178.044,
+      -14.232
+    ],
+    "areaSr": 0.0000032441,
+    "isMicrostate": true
+  },
+  {
+    "id": "EH",
+    "name": "Western Sahara",
+    "flag": "🇪🇭",
+    "kind": "territory",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": false,
+    "centroid": [
+      -12.271,
+      24.212
+    ],
+    "bbox": [
+      -17.099,
+      20.806,
+      -8.682,
+      27.656
+    ],
+    "frameBbox": [
+      -17.099,
+      20.806,
+      -8.682,
+      27.656
+    ],
+    "areaSr": 0.0022369,
+    "isMicrostate": false
+  },
+  {
+    "id": "YE",
+    "name": "Yemen",
+    "flag": "🇾🇪",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Asia",
+    "isUnMember": true,
+    "centroid": [
+      47.52,
+      15.944
+    ],
+    "bbox": [
+      42.549,
+      12.319,
+      54.511,
+      18.996
+    ],
+    "frameBbox": [
+      42.658,
+      12.608,
+      53.086,
+      18.996
+    ],
+    "areaSr": 0.011188,
+    "isMicrostate": false
+  },
+  {
+    "id": "ZM",
+    "name": "Zambia",
+    "flag": "🇿🇲",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      27.809,
+      -13.456
+    ],
+    "bbox": [
+      21.979,
+      -18.042,
+      33.662,
+      -8.194
+    ],
+    "frameBbox": [
+      21.979,
+      -18.042,
+      33.662,
+      -8.194
+    ],
+    "areaSr": 0.018615,
+    "isMicrostate": false
+  },
+  {
+    "id": "ZW",
+    "name": "Zimbabwe",
+    "flag": "🇿🇼",
+    "kind": "country",
+    "parentId": null,
+    "continent": "Africa",
+    "isUnMember": true,
+    "centroid": [
+      29.851,
+      -18.997
+    ],
+    "bbox": [
+      25.224,
+      -22.402,
+      33.007,
+      -15.643
+    ],
+    "frameBbox": [
+      25.224,
+      -22.402,
+      33.007,
+      -15.643
+    ],
+    "areaSr": 0.0096129,
+    "isMicrostate": false
+  }
+]
