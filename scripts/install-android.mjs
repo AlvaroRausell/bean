@@ -47,7 +47,7 @@ function parseArgs(argv) {
     } else if (arg === '--help' || arg === '-h') {
       console.log(
         [
-          'Usage: pnpm install:android [options]',
+          'Usage: npm run install:android -- [options]',
           '',
           'Builds a standalone Release APK of Bean and installs it on a connected Android phone.',
           '',
