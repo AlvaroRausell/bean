@@ -23,6 +23,8 @@ function parseArgs(argv) {
     device: process.env.ANDROID_SERIAL ?? null,
     allowEmulator: false,
     apkOnly: false,
+    installOnly: false,
+    allAbis: false,
     clean: false,
     dryRun: false,
   };
@@ -34,6 +36,10 @@ function parseArgs(argv) {
       opts.dryRun = true;
     } else if (arg === '--apk-only') {
       opts.apkOnly = true;
+    } else if (arg === '--install-only') {
+      opts.installOnly = true;
+    } else if (arg === '--all-abis') {
+      opts.allAbis = true;
     } else if (arg === '--emulator') {
       opts.allowEmulator = true;
     } else if ((arg === '--device' || arg === '-d') && argv[i + 1]) {
@@ -49,8 +55,10 @@ function parseArgs(argv) {
           '  -d, --device <serial>  Target Android device serial (auto-detected if omitted)',
           '      --emulator         Allow installing onto a running Android Emulator',
           '      --apk-only         Build the standalone Release APK without installing via adb',
+          '      --install-only     Install the already-built Release APK without rebuilding',
+          '      --all-abis         Build all 4 ABIs instead of matching the connected device ABI',
           '      --clean            Run Gradle clean before building Release APK',
-          '      --dry-run          Print detected SDK, adb, and device without building',
+          '      --dry-run          Print detected SDK, Java, adb, and device without building',
           '  -h, --help             Show this help message',
         ].join('\n')
       );
@@ -58,6 +66,49 @@ function parseArgs(argv) {
     }
   }
   return opts;
+}
+
+function resolveJavaHome() {
+  if (process.env.JAVA_HOME && existsSync(process.env.JAVA_HOME)) {
+    return process.env.JAVA_HOME;
+  }
+  const candidates = [
+    '/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home',
+    '/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home',
+    '/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home',
+    '/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home',
+    '/Applications/Android Studio.app/Contents/jbr/Contents/Home',
+  ];
+  for (const dir of candidates) {
+    if (existsSync(dir)) return dir;
+  }
+  if (process.platform === 'darwin') {
+    try {
+      const detected = execFileSync('/usr/libexec/java_home', ['-v', '17+'], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+      if (detected && existsSync(detected)) return detected;
+    } catch {
+      // fall through
+    }
+  }
+  return null;
+}
+
+function resolveDeviceAbi(adbPath, serial) {
+  try {
+    const abi = execFileSync(adbPath, ['-s', serial, 'shell', 'getprop', 'ro.product.cpu.abi'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'].includes(abi)) {
+      return abi;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
 }
 
 function resolveAndroidSdk() {
@@ -165,6 +216,7 @@ function main() {
   const opts = parseArgs(process.argv.slice(2));
   const sdkDir = resolveAndroidSdk();
   const adbPath = resolveAdb(sdkDir);
+  const javaHome = resolveJavaHome();
 
   if (!sdkDir) {
     console.error(
@@ -177,12 +229,15 @@ function main() {
     ...process.env,
     ANDROID_HOME: sdkDir,
     ANDROID_SDK_ROOT: sdkDir,
+    ...(javaHome ? { JAVA_HOME: javaHome } : {}),
   };
 
   console.log(`Android SDK   : ${sdkDir}`);
+  console.log(`Java Home     : ${javaHome ?? '(using PATH default)'}`);
   console.log(`adb           : ${adbPath ?? '(not found)'}`);
 
   let target = null;
+  let targetAbi = null;
   if (!opts.apkOnly) {
     if (!adbPath) {
       console.error('adb not found in Android SDK platform-tools.');
@@ -191,6 +246,9 @@ function main() {
     if (opts.dryRun) {
       const devices = listAdbDevices(adbPath);
       const ready = devices.find((d) => d.state === 'device' && (opts.allowEmulator || !d.isEmulator));
+      if (ready && !opts.allAbis) {
+        targetAbi = resolveDeviceAbi(adbPath, ready.serial);
+      }
       console.log(
         `Target device : ${
           ready
@@ -198,26 +256,37 @@ function main() {
             : 'none connected (plug in Android phone with USB debugging enabled, or use --apk-only)'
         }`
       );
+      console.log(`Target ABI    : ${targetAbi ?? 'all (arm64-v8a, armeabi-v7a, x86, x86_64)'}`);
       console.log(`Output APK    : ${APK_PATH}`);
       console.log('\n[dry-run] Android toolchain verified.');
       return;
     }
     target = resolveTargetDevice(adbPath, opts);
+    if (!opts.allAbis) {
+      targetAbi = resolveDeviceAbi(adbPath, target.serial);
+    }
     console.log(`Target device : ${target.model} [${target.serial}] (${target.state})`);
+    console.log(`Target ABI    : ${targetAbi ?? 'all (arm64-v8a, armeabi-v7a, x86, x86_64)'}`);
   } else if (opts.dryRun) {
+    console.log(`Target ABI    : all (arm64-v8a, armeabi-v7a, x86, x86_64)`);
     console.log(`Output APK    : ${APK_PATH}`);
     console.log('\n[dry-run] Ready to build standalone Release APK.');
     return;
   }
 
-  if (!existsSync(GRADLEW)) {
-    console.log('\nGenerating android/ project with expo prebuild…');
-    run('npx', ['expo', 'prebuild', '--platform', 'android'], ROOT, env);
-  }
+  if (!opts.installOnly) {
+    if (!existsSync(GRADLEW)) {
+      console.log('\nGenerating android/ project with expo prebuild…');
+      run('npx', ['expo', 'prebuild', '--platform', 'android'], ROOT, env);
+    }
 
-  const gradleTasks = opts.clean ? ['clean', 'assembleRelease'] : ['assembleRelease'];
-  console.log(`\nBuilding standalone Release APK (./gradlew ${gradleTasks.join(' ')})…`);
-  run(GRADLEW, gradleTasks, ANDROID_DIR, env);
+    const gradleTasks = opts.clean ? ['clean', 'assembleRelease'] : ['assembleRelease'];
+    if (targetAbi) {
+      gradleTasks.push(`-PreactNativeArchitectures=${targetAbi}`);
+    }
+    console.log(`\nBuilding standalone Release APK (./gradlew ${gradleTasks.join(' ')})…`);
+    run(GRADLEW, gradleTasks, ANDROID_DIR, env);
+  }
 
   if (!existsSync(APK_PATH)) {
     console.error(`Expected APK not found at ${APK_PATH}`);
